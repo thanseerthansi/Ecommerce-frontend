@@ -16,6 +16,7 @@ export default function Adminproduct() {
   const [filteredprduct,setfilteredprduct]=useState([]);
   const [editproduct,seteditproduct]=useState(null);
   const [searchvalue,setsearchvalue]=useState();
+  const [filter,setfilter]=useState();
   const [modalvalue,setmodalvalue]=useState(false);
   const [modaledit,setmodaledit]=useState(false);
   const [productvalues,setproductvalues]=useState([]);
@@ -68,6 +69,7 @@ export default function Adminproduct() {
       let data = await axios.get("http://127.0.0.1:8000/product/product/",{ headers: {"Authorization" : `Bearer ${token}`}})
       // console.log("moissorderdata",data.data)
       setproductlist(data.data)
+      setfilteredprduct(data.data)
     }
     catch (error) {
       console.log(error)
@@ -257,10 +259,34 @@ export default function Adminproduct() {
       <div className='pt-3 ps-md-5' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>       
           {/* <div className='float-right'><button className='btn btn-primary float-end'>Add new</button></div> */}         
+          
           <div className='container pt-md-0 pt-0'>
           <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="icon-park-twotone:order" width="40" height="23" />  <b>Products List</b> 
           </div>
+           {/* filterstart */}
+           <div className="filter-sort- d-flex pt-2  flex-wrap justify-content-center">
+            <div className="filter-sorting justify-content-end">
+              <div className="collection-sorting position-relative ">
+                <div className="sorting-header  d-flex align-items-center justify-content-end">
+                  <span className="sorting-title me-2"><b style={{color:"grey"}}>Sort by:</b></span>
+                  <span className="active-sorting" >{filter ? <b>{filter.category_type}</b> :<b>All</b>}</span>
+                  <span className="sorting-icon">
+                    <svg className="icon icon-down" xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="6 9 12 15 18 9" />
+                    </svg>
+                  </span>
+                </div>
+                <ul className="sorting-lists list-unstyled md-10 w-auto ">
+                  <li  className="text_14" style={{backgroundColor:"white",padding:"4px",borderRadius:"3px"}} onClick={()=>setfilter()}> All </li>
+                  {categoryvalue.map((itm,k)=>(
+                      <li onClick={()=>setfilter(itm)} key={k}><span  style={{backgroundColor:itm.color,padding:"4px",borderRadius:"3px"}} className="text_14">{itm.category_type}</span></li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+          {/* filterend? */}
           <div className='row col-12'>
             <div className='d-flex col-8 col-md-6 p-2 '>
               <div className=' d-flex w-100  border ps-1 rounded'>
@@ -287,7 +313,7 @@ export default function Adminproduct() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {(filteredprduct.length ? filteredprduct : productlist).map((itm,k)=>(
+              {(filter? filteredprduct .filter(t=>t.category[0].category_type.toUpperCase().includes(filter.category_type.toUpperCase())): filteredprduct).map((itm,k)=>(
                 <tr key={k}>
                 <th scope="row">{k+1}</th>
                 <td>

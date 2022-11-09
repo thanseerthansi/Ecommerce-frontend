@@ -67,9 +67,14 @@ export default function Admincategory() {
             notifyadded();
           }else{notifyupdated();}
           
+        }else if(postdata.data.Status===401){
+          console.log("unautherized ")
         }
       } catch (error) {
         console.log(error)
+        if(error.response.Status===401){
+          console.log("unautherized ")
+        }
       }
     }
     const allproductnull=()=>{

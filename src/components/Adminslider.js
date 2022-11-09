@@ -5,7 +5,9 @@ import { Link} from 'react-router-dom';
 // import axios from 'axios';
 export default function Adminslider() {
     const [isOpen, setIsOpen] = useState(false)
-    const [isproduct, setisproduct] = useState(false)
+    const [isslider, setisslider] = useState(true)
+    // console.log("isslider",isslider)
+    // const [isproduct, setisproduct] = useState(false)
     const variants = {
         open: { opacity: 1, height:"100%" },
         closed: { opacity: 0, height: "0",display:"none" },
@@ -13,8 +15,14 @@ export default function Adminslider() {
     
   return (
     <div className=' p-1  position-fixed ' style={{zIndex:"2"}}>
+        <div className='d-block d-md-none'>
+        <Icon onClick={()=>setisslider(!isslider)} icon="dashicons:menu" width="30" height="30" />
+
+        </div>
+      
+        <>
         {/* <div className='hov bg-dark'><Link  to="/admindashboard" className="link-light" data-key="t-analytics" style={{paddingLeft:"2rem"}}> <Icon icon="ic:baseline-person" width="40" height="24" />  <span> Profile</span></Link></div> */}
-        <div className='  d-none d-md-block rounded pt-2 bg-dark  vh-100 overflow-auto' style={{width:"190px"}}>
+        <div  className={isslider ?'  d-none d-md-block rounded pt-2 bg-dark vh-100 overflow-auto': ' rounded pt-2 bg-dark vh-100 overflow-auto'} style={{width:"190px"}}>
         <div className='hov p-1'><Link  to="/adminprofile" className="link-light" data-key="t-analytics" style={{paddingLeft:"2rem"}}> <Icon icon="ic:baseline-person" width="40" height="24" />  <span> Profile</span></Link></div>
         <hr style={{color:"white"}}></hr>
         <ul className="custom-list-marker hov ">
@@ -40,7 +48,7 @@ export default function Adminslider() {
                     </Link></li>
             
             </motion.nav>
-            <li  role='button' className='d-flex  text-white  mt-3' onClick={() => setisproduct(isproduct => !isproduct)} >
+            <li  role='button' className='d-flex  text-white  mt-3'  >
         
                 <Link  to="/adminproduct" className="d-flex link-light" data-key="t-analytics"> <Icon icon="ri:product-hunt-fill" width="40" height="23" />  <p>Products</p></Link></li>
             {/* <motion.nav
@@ -68,6 +76,7 @@ export default function Adminslider() {
                  </Link></li>
         </ul>
         </div>
+        </>
     </div>
   )
 }

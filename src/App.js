@@ -15,9 +15,12 @@ import Adminproduct from "./components/Adminproduct";
 import Adminprofile from "./components/Adminprofile";
 import Home from './components/Home';
 import Simplecontextprovider from "./components/Simplecontext";
+import { createBrowserHistory } from 'history';
+
 
 
 function App() {
+  const history = require("history").createBrowserHistory()
   var refresh_token = window.localStorage.getItem('refresh_token')
   useEffect(() =>{
   let interval = setInterval (() => {
@@ -25,8 +28,7 @@ function App() {
       if (refresh_token) {
           UpdateToken()
       }
-      else{ return Navigate('/adminlogin');}
-
+      
         }, 300000 );
         return ()=> clearInterval(interval)
       },[]);
@@ -41,6 +43,10 @@ function App() {
           window.localStorage.setItem('access_token', data.data.access)    
         } catch (error) {
           console.log("error",error)
+          // console.log("erro/rmessga",error.response.status)
+          if (error.response.status===401){
+            history.push("/adminlogin")
+          }
         }
         
 

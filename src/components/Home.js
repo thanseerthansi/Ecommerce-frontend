@@ -25,10 +25,12 @@ export default function Home() {
   const [contact,setcontact]=useState();
   const [address,setaddress]=useState();
   const [order,setorder]=useState([]);
+  const [checkoutorder,setcheckoutorder]=useState([]);
+  const [myordermodal,setmyordermodal]=useState(false)
   const [category,setcategory]=useState([])
   const [filtercat,setfiltercat]=useState();
   // const [checkerror,setcheckerror]=useState()
-  // console.log("cart",filtercat.id)
+  console.log("cartcheckoutorder",checkoutorder)
   const notify = () => toast.success('✅ Added to Cart!', {
     position: "top-left",
     });
@@ -46,12 +48,21 @@ export default function Home() {
     Getproduct() 
     Getcity()
     Getcategory()
-    // window.localStorage.setItem('cart',[])
+    // window.localStorage.setItem('checkoutorder',[])
+    let orderlist = window.localStorage.getItem('checkoutorder')
+    // checkoutorder
+    // console.log("orderlis3",JSON.parse(orderlist))
+    try {
+      if (window.localStorage.getItem('checkoutorder').length){
+        // console.log("listpresent")
+        setcheckoutorder(JSON.parse(orderlist))  
+      }else{}      
+    } catch (error) {} 
     let cartadd = window.localStorage.getItem('cart')
     try {
       if (window.localStorage.getItem('cart').length){
         setviewcart(JSON.parse(cartadd))  
-      }else(console.log("not"))       
+      }else{}      
     } catch (error) {}    
   },[]);
   const Getcategory = ()=>{axios.get("http://127.0.0.1:8000/product/category/").then(response=>{
@@ -177,13 +188,13 @@ export default function Home() {
       if(customername&&contact&&selectcity!==undefined&&address){
         let list =[];
         productlist.forEach(element => {
-          // console.log("quantity",element.quantity)
+          // console.log("quantity",element)
           const data = {
             "customer_name":customername,
             "product":element.product.id,
             "quantity":element.quantity,
             "delivery_address":address,
-            "total":total+delivery,
+            "total":total+delivery+(total/10),
             "subtotal_price":total,
             "delivery_charge":delivery,
             "subtotal":element.subtotal,
@@ -195,6 +206,7 @@ export default function Home() {
           }
         );
         setorder(list)
+        // console.log("listview",list)
         axios({
           method: 'post',
           url: 'http://127.0.0.1:8000/product/order/',
@@ -203,7 +215,27 @@ export default function Home() {
         }).then(response => {
             // console.log(response.data.Status);
             if (response.data.Status ===200){
-              // console.  blog(response.data);
+              console.log(response.data);
+              // add to orderlist
+              let ordlist =[];
+              productlist.forEach(element => {
+                // console.log("quantity",element)
+                const ord = {
+                  "product":element.product,
+                  "quantity":element.quantity,
+                  "total":total+delivery+(total/10),
+                  "vat":total/10,
+                  "subtotal_price":total,
+                  "delivery_charge":delivery,
+                  "subtotal":element.subtotal,
+                } 
+                ordlist.push(ord)
+                }
+              );
+              let broughtorder = checkoutorder.concat(ordlist)
+              console.log("broughtorder",broughtorder)
+              setcheckoutorder(broughtorder)
+              window.localStorage.setItem("checkoutorder",JSON.stringify(broughtorder))
               setviewcart([])
               window.localStorage.removeItem('cart')
               notifyadd()
@@ -217,7 +249,7 @@ export default function Home() {
     }
   return (
     <div>      
-        <Header/>
+        <Header show={myordermodal} setshow={setmyordermodal}/>
    
         <Slider/> 
     
@@ -271,7 +303,7 @@ export default function Home() {
         {filtercat ?<>
         { product.filter(t=>parseInt(t.category[0].id) === parseInt(filtercat.id)).map((itm,k)=>(      
         <div key={k}  className="col-lg-3 col-md-6 col-6 aos-init col-md"  data-aos="fade-up" data-aos-duration={700} >
-          <div  className="product-card"  style={{padding:"30px"}}>
+          <div  className="product-card"  style={{padding:"20px"}}>
             <div className="product-card-img">
               <button className="hover-switch" onClick={()=>productid(itm) }>
                 {/* <img className="secondary-img" src="assets/img/products/furniture/10.jpg" alt="product-img" /> */}
@@ -304,7 +336,46 @@ export default function Home() {
         
         ))}
         </>:null}
+        {filtercat ? <>
+        {filtercat.category_type.toUpperCase()!=="DEALS" ?
+        <>
+        <h3 className='text-center'><u><b>Great Deals</b></u></h3>
+        { product.filter(t=>t.category[0].category_type.toUpperCase().includes("DEALS")).map((itm,k)=>(      
+        <div key={k}  className="col-lg-3 col-md-6 col-6 aos-init col-md"  data-aos="fade-up" data-aos-duration={700} >
+          <div  className="product-card"  style={{padding:"20px"}}>
+            <div className="product-card-img">
+              <button className="hover-switch" onClick={()=>productid(itm) }>
+                {/* <img className="secondary-img" src="assets/img/products/furniture/10.jpg" alt="product-img" /> */}
+                {/* {itm.images[0]?  */}
+                <img className="primary-img" src={itm.images[0] ?
+                itm.images[0].image : 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png'} alt={itm.title} />
+                {/* :null} */}
+              </button>
+              <div className=" product-card-action-2 justify-content-center">
+                <button data-tip data-for="registerTip" onClick={()=>productid(itm) } className="action-card action-quickview">
+                <Icon icon="bi:zoom-in" width="20" height="25" />
+                </button>
+                <button data-tip data-for="carttip" onClick={()=>{if(itm.price_list){addtocart(itm,itm.price_list.split(',')[0])}} }  className="action-card action-quickview">
+                <Icon icon="bi:cart4" width="35" height="30" />
+                </button>
+              </div>             
+            </div>
+            <div className="product-card-details">              
+              <h3 className="product-card-title">
+                <p>{itm.title}</p>
+              </h3>
+              <div className="product-card-price">
+                <span className="card-price-regular">{itm.price} AED</span>
+                <span className="card-price-compare text-decoration-line-through">{itm.old_price} AED</span>
+              </div>
+            </div>
+          </div>
+      
+        </div>
         
+        ))}
+        </>:null }
+        </>:null}
         </div>
         </div><br/>
         </div>
@@ -478,13 +549,18 @@ export default function Home() {
                     <span className="cart-subprice">{viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0)} AED</span>
                   </div>
                   <div className="minicart-calc d-flex align-items-center justify-content-between">
+                    <span className="cart-subtotal mb-0">VAT</span>
+                    <span className="cart-subprice">{(parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))/10)} AED</span>
+                  </div>
+                  <div className="minicart-calc d-flex align-items-center justify-content-between">
                     <span className="cart-subtotal mb-0">Delivery</span>
                     <span className="cart-subprice">{ Math.max(...viewcart.map(o => o.product.delivery_charge))} AED</span>
                   </div>
                   <hr/>
                   <div className="minicart-calc d-flex align-items-center justify-content-between">
                     <span className="cart-subtotal mb-0">Total Amount</span>
-                    <span className="cart-subprice">{parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))} AED</span>
+                    {/* <span className="cart-subprice">{parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))} AED</span> */}
+                    <span className="cart-subprice">{parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))+((parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0)))/10)} AED</span>
                   </div>
                   
                 </div>
@@ -536,7 +612,98 @@ export default function Home() {
 
 
         {/* product drawer ends */}
-          
+        {/* my orders start */}
+        {myordermodal? 
+        <div className="modal fade show" tabIndex={-1} id="quickview-modal" aria-modal="true" role="dialog" style={{display: 'block', paddingLeft: "20%",paddingRight:"2%"}}>
+          <div className="modal-dialog modal-dialog-centered modal-xl">
+            <div className="modal-content">
+              <div className="modal-header border-0">
+                <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={()=>setmyordermodal(!myordermodal) } aria-label="Close" />
+              </div>
+              {/* {idproduct.map((itm,k)=>( */}
+              <div  className="modal-body">
+              {checkoutorder.length ? 
+          <div className="offcanvas-body p-0 row">
+            <div className="cart-content-area d-flex justify-content-between flex-column col-md-6">
+              <div style={{height: '20rem'}} className="minicart-loop overflow-auto custom-scrollbar">
+            
+                {checkoutorder.map((itm,k)=>(
+                <div key={k} className="minicart-item d-flex">
+                  <div className="mini-img-wrapper">
+                    <img className="mini-img" src={itm.product.images[0].image} alt="img" />
+                  </div>
+                  <div className="product-info">
+                    <h2 className="product-title">{itm.product.title}</h2>
+                   
+                    <div className="misc d-flex align-items-end justify-content-between">
+                      <div className=" d-flex align-items-center justify-content-between">
+                        {/* <button onClick={()=>Handlerdecrement(k)} className="qty-btn dec-qty"><img src="assets/img/icon/minus.svg" alt="minus" /></button>
+                        <b className="qty-input" type="number" name="qty"  min={0} >{itm.quantity}</b>
+                        <button onClick={()=>handlerincrement(k)} className="qty-btn inc-qty"><img src="assets/img/icon/plus.svg" alt="plus" /></button> */}
+                        
+                          
+                          <div className="product-price">Quantity : {itm.quantity}</div>
+                      </div>
+                      <div className="product-remove-area d-flex flex-column align-items-end">
+                        <div className="product-price">{itm.subtotal} AED</div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                ))}  
+              </div>
+              
+            </div>
+            <div className='col-md-6'>
+            <div className="container col-12 ">
+           
+            <div className="minicart-footer">
+                <div className="minicart-calc-area">
+                  <div className="minicart-calc d-flex align-items-center justify-content-between">
+                    <span className="cart-subtotal mb-0">Price</span>
+                    <span className="cart-subprice">{checkoutorder.reduce((n, {subtotal}) => n + parseInt(subtotal), 0)} AED</span>
+                  </div>
+                  <div className="minicart-calc d-flex align-items-center justify-content-between">
+                    <span className="cart-subtotal mb-0">VAT</span>
+                    <span className="cart-subprice">{(checkoutorder.reduce((n, {vat}) => n + (vat), 0))} AED</span>
+                  </div>
+                  <div className="minicart-calc d-flex align-items-center justify-content-between">
+                    <span className="cart-subtotal mb-0">Delivery</span>
+                    <span className="cart-subprice">{ Math.max(...checkoutorder.map(o => o.product.delivery_charge))} AED</span>
+                  </div>
+                  <hr/>
+                  <div className="minicart-calc d-flex align-items-center justify-content-between">
+                    <span className="cart-subtotal mb-0">Total Amount</span>
+                    {/* <span className="cart-subprice">{parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))} AED</span> */}
+                    <span className="cart-subprice">{parseInt((Math.max(...checkoutorder.map(o => o.product.delivery_charge))))+parseInt(checkoutorder.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))+parseInt(checkoutorder.reduce((n, {vat}) => n + parseInt(vat), 0))} AED</span>
+                  </div>
+                  
+                </div>
+                
+              </div>
+            
+            
+            {/* <p><b className='text-danger'>{checkerror}*</b></p><br/> */}
+            {/* <div className="minicart-btn-area d-flex align-items-center justify-content-between ">
+                  
+                  <button onClick={()=>checkout(viewcart,viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0),Math.max(...viewcart.map(o => o.product.delivery_charge)))} className="minicart-btn btn-primary">Checkout</button>
+                </div><br/><br/> */}
+                
+                
+              
+
+            </div>
+            </div>
+          </div>
+          :<><p className='mt-5 text-center'><b>Your Order is empty</b></p></>}
+              </div>
+              {/* ))} */}
+            </div>
+          </div>
+        </div>
+        :null} 
+        {/* my orders ends */}
         <Footer/>
       
     </div>

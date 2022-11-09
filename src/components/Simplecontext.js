@@ -11,9 +11,10 @@ export default function Simplecontextprovider({children}) {
     }, [])
     
     const Getcategory = ()=>{axios.get("http://127.0.0.1:8000/product/category/").then(response=>{
-    // console.log("response",response.data[0])
+    // console.log("responsedata",response.data)
     setcategoryvalue(response.data);
     setfilteredcategory(response.data)
+    
     
     })
     .catch(err => console.warn("error",err));
