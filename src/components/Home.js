@@ -670,13 +670,13 @@ export default function Home() {
                   </div>
                   <div className="minicart-calc d-flex align-items-center justify-content-between">
                     <span className="cart-subtotal mb-0">Delivery</span>
-                    <span className="cart-subprice">{ Math.max(...checkoutorder.map(o => o.product.delivery_charge))} AED</span>
+                    <span className="cart-subprice">{(checkoutorder.reduce((n, {product}) => n + (product.delivery_charge), 0))}AED</span>
                   </div>
                   <hr/>
                   <div className="minicart-calc d-flex align-items-center justify-content-between">
                     <span className="cart-subtotal mb-0">Total Amount</span>
                     {/* <span className="cart-subprice">{parseInt((Math.max(...viewcart.map(o => o.product.delivery_charge))))+parseInt(viewcart.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))} AED</span> */}
-                    <span className="cart-subprice">{parseInt((Math.max(...checkoutorder.map(o => o.product.delivery_charge))))+parseInt(checkoutorder.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))+parseInt(checkoutorder.reduce((n, {vat}) => n + parseInt(vat), 0))} AED</span>
+                    <span className="cart-subprice">{(checkoutorder.reduce((n, {product}) => n + (product.delivery_charge), 0))+parseInt(checkoutorder.reduce((n, {subtotal}) => n + parseInt(subtotal), 0))+checkoutorder.reduce((n, {vat}) => n + vat, 0)} AED</span>
                   </div>
                   
                 </div>
