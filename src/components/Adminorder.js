@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect,useRef, useState } from 'react'
+import React, { useContext, useEffect,useRef, useState } from 'react'
 import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider';
 import { Icon } from '@iconify/react';
@@ -8,7 +8,13 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // import Test from './Adminexportexcel';
 import { DownloadTableExcel } from 'react-export-table-to-excel';
+import { Simplecontext } from './Simplecontext';
+import Callaxios from './Callaxios';
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+
 export default function Adminorder() {
+  const {accesscheck} =useContext(Simplecontext)
   const [filterstatus,setfilterstatus]=useState([]);
   const [orderdata,setorderdata]=useState([]);
   const [ordersearchdata,setordersearchdata]=useState([]);
@@ -26,90 +32,116 @@ export default function Adminorder() {
   const statusnotify = () => toast.success('✅ Status Updated Successfully!', {
     position: "top-center",
     });
-  var token = window.localStorage.getItem('access_token')
+    const notifyerror = (msg) => toast.error(msg, {
+      position: "top-center",
+      });
+  // var token = window.localStorage.getItem('access_token')
   // console.log("token",token)
   useEffect(() => {
     status()
     orders()
-    orderproduct()
+    // orderproduct()
    
   }, [])
   const status = async() =>{
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/status/",{headers:{"Authorization" : `Bearer ${token}`}})
+      accesscheck()
+      let data = await Callaxios("get","product/status/")
+      // axios.get("http://127.0.0.1:8000/product/status/",{headers:{"Authorization" : `Bearer ${token}`}})
       // console.log(data.data)
-      setfilterstatus(data.data)
-      setfilter([])
+      if (data.status===200){
+        setfilterstatus(data.data)
+        setfilter([])
+      }else{
+        notifyerror("Something went wrong")
+      }
+      
     }
     catch (error) {
       console.log(error)
     } 
   }
   const orders =async()=>{
+    accesscheck()
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
+      let data = await Callaxios("get","product/order/")
+      // axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
       // console.log("data",data.data)
-      setorderdata(data.data)
-      setordersearchdata(data.data)
+      if (data.status===200){
+        setorderdata(data.data)
+        setordersearchdata(data.data)
+      }
+     
     }
     catch (error) {
       console.log(error)
     }
   }
-  const orderproduct =async()=>{
-    // console.log("ordreid",orderid)
-    try{
-      let data = await axios.get("http://127.0.0.1:8000/product/ordererproduct/",{headers:{"Authorization" : `Bearer ${token}`}})
-      // console.log("data",data.data)
-      setoproducts(data.data)
-    }
-    catch (error) {
-      console.log(error)
-    }
-  }
+  // const orderproduct =async()=>{
+  //   // console.log("ordreid",orderid)
+  //   try{
+  //     let data = await axios.get("http://127.0.0.1:8000/product/ordererproduct/",{headers:{"Authorization" : `Bearer ${token}`}})
+  //     // console.log("data",data.data)
+  //     setoproducts(data.data)
+  //   }
+  //   catch (error) {
+  //     console.log(error)
+  //   }
+  // }
  
-  const deleteproduct =(k,id)=>{
+  const deleteproduct =async(id)=>{
     // console.log("k",k)
     // console.log("id",id)
+      accesscheck()
+      let data = await Callaxios("delete","product/order/",{"id":id})
+      if (data.data.Status===200){
+        notify()       
+        orders()
+      }
+    }
+    //  axios({
+    //   method: 'delete',
+    //   url: 'http://127.0.0.1:8000/product/order/',
+    //   headers:{"Authorization" : `Bearer ${token}`},
+    //   data:{"id":id},
 
-     axios({
-      method: 'delete',
-      url: 'http://127.0.0.1:8000/product/order/',
-      headers:{"Authorization" : `Bearer ${token}`},
-      data:{"id":id},
+    // }).then(response => {
+    //   if (response.data.Status===200){
+    //     // console.log("data",response.data)
+    //     const splc = orderdata
+    //     // console.log("array",splc[k])
+    //     splc.splice(k,1)
+    //     setorderdata(() => [ ...splc]);
+    //     notify()
+    //   }else{console.log(response.data.Message)}
+    //   })
+    //   .catch(err => console.warn("error",err));   
+    //   };
 
-    }).then(response => {
-      if (response.data.Status===200){
-        // console.log("data",response.data)
-        const splc = orderdata
-        // console.log("array",splc[k])
-        splc.splice(k,1)
-        setorderdata(() => [ ...splc]);
-        notify()
-      }else{console.log(response.data.Message)}
-      })
-      .catch(err => console.warn("error",err));   
-      };
     const changestatus=async(itmid,statusname)=>{
+      accesscheck()
       // console.log("itm",itmid)
       // console.log("item",statusname)
-      let list = [
-        { "id":itmid,
+      let list = { "id":itmid,
         "purchasestatus":statusname
         }
-      ]
+      
       try {
-        let data = await axios({
-          method: 'post',
-          url: 'http://127.0.0.1:8000/product/order/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data:list
-        })
+        let data = await Callaxios("post","product/order/",list)
+        // axios({
+        //   method: 'post',
+        //   url: 'http://127.0.0.1:8000/product/order/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data:list
+        // })
         // console.log("response",data.data)
         if (data.data.Status===200){
           orders()
           statusnotify()
-        }else{console.log(data.data.Message)}
+        }
+        else{console.log(data.data.Message)
+          notifyerror("Something Went Wrong")
+        }
       } catch (error) {
         console.log(error)
       }
@@ -126,6 +158,23 @@ export default function Adminorder() {
       }
       else{setordersearchdata(orderdata)}
   }
+  const submitdeletecategory = (itemid) => {
+    confirmAlert({
+      title: "Confirmation",
+      message: `Are you sure to delete this ?`,
+      buttons: [
+        {
+          label: "Yes",           
+          onClick:()=>deleteproduct(itemid),
+        },
+        {
+          label: "No"
+          // onClick: () => alert("Click No")
+        } 
+      ],
+      
+    });
+  };
 
   return (
     <div >
@@ -291,7 +340,7 @@ export default function Adminorder() {
             
                     </Dropdown></td>
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
-                    <td><Icon onClick={()=>deleteproduct(k,itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
+                    <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
                     
                 </tr>
               ))}   

@@ -1,31 +1,44 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider'
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
+import { Simplecontext } from './Simplecontext';
+import Callaxios from './Callaxios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 export default function Admindashboard() {
+  const {accesscheck} =useContext(Simplecontext)
   const[orderdata,setorderdata]=useState([]);
   const[todaysorder,settodaysorder]=useState([]);
-  var token = window.localStorage.getItem('access_token')
+  // var token = window.localStorage.getItem('access_token')
   useEffect(() => {
    orders()
 
   }, [])
-  
+  const notifyerror = (msg) => toast.error(msg, {
+    position: "top-center",
+    });
   const orders =async()=>{
+    accesscheck()
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
+      let data = await Callaxios("get","product/order/")
+      // axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
       // console.log("data",data.data[0].updated_date.split('T')[0])
-      setorderdata(data.data)
-      const timeElapsed = Date.now();
-      const today = new Date(timeElapsed);
-      let newdate = today.toISOString();
-      // console.log("ldate",newdate.split('T')[0])
-      let fvalue = data.data.filter(t=>t.updated_date.split('T')[0].includes(newdate.split('T')[0]))
-          settodaysorder(fvalue)
-          // console.log("favlue",fvalue)
+      if (data.status===200){
+        setorderdata(data.data)
+        const timeElapsed = Date.now();
+        const today = new Date(timeElapsed);
+        let newdate = today.toISOString();
+        // console.log("ldate",newdate.split('T')[0])
+        let fvalue = data.data.filter(t=>t.updated_date.split('T')[0].includes(newdate.split('T')[0]))
+            settodaysorder(fvalue)
+            // console.log("favlue",fvalue)
+      }else{
+        notifyerror("Something went wrong")
+      }
+      
     }
     catch (error) {
       console.log(error)

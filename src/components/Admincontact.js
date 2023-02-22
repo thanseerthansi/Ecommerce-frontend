@@ -8,9 +8,11 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { Simplecontext } from './Simplecontext';
+import Callaxios from './Callaxios';
 
 export default function Admincontact() {
-    
+  const {accesscheck} =useContext(Simplecontext)
     // console.log("datcata",categoryvalue)
     const [contactdata,setcontactdata]=useState([]); 
     // const [searchvalue,setsearchvalue]=useState();
@@ -21,7 +23,8 @@ export default function Admincontact() {
     const [email,setemail]=useState();
     const [instagram,setinstagram]=useState();
     const [whatsapp,setwhatsapp]=useState();
-    var token = window.localStorage.getItem('access_token')
+
+    // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         Getcontact()
@@ -35,12 +38,20 @@ export default function Admincontact() {
     const notifyupdated = () => toast.success('✅ Updated Successfully!', {
       position: "top-center",
       });
-
+    const notifyerror = (msg) => toast.error(msg, {
+      position: "top-center",
+      });
     const Getcontact=async()=>{
         try{
-            let data = await axios.get("http://127.0.0.1:8000/product/contact/",{ headers: {"Authorization" : `Bearer ${token}`}})
+            let data = await Callaxios("get","product/contact/")
+            // axios.get("http://127.0.0.1:8000/product/contact/",{ headers: {"Authorization" : `Bearer ${token}`}})
             // console.log("moissorderdata",data.data)
-            setcontactdata(data.data)
+            if (data.status===200){
+              setcontactdata(data.data)
+            }else{
+              notifyerror("Something went wrong")
+            }
+            
           
           }
           catch (error) {
@@ -57,6 +68,7 @@ export default function Admincontact() {
     // }
     const postcontact=async(e,itm)=>{
       e.preventDefault();
+      accesscheck()
       // console.log("e",e)
       // console.log("itm",itm)
       let datalist = {"address":address,         
@@ -69,12 +81,13 @@ export default function Admincontact() {
         datalist.id=itm.id
       }
       try {
-        const postdata = await  axios({
-          method: 'post',
-          url: 'http://127.0.0.1:8000/product/contact/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data: datalist
-        })
+        const postdata = await Callaxios("post","product/contact/",datalist)
+        //  axios({
+        //   method: 'post',
+        //   url: 'http://127.0.0.1:8000/product/contact/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data: datalist
+        // })
         // console.log(postdata.data)
         setselectedcontact()
         if (postdata.data.Status===200){
@@ -85,6 +98,8 @@ export default function Admincontact() {
             notifyadded();
           }else{notifyupdated();}
           
+        }else{
+          notifyerror("Something went wrong")
         }
       } catch (error) {
         console.log(error)
@@ -99,18 +114,23 @@ export default function Admincontact() {
     }
     const deletecontact = async(id)=>{
       try {
-        let data = await axios({
-          method: 'delete',
-          url: 'http://127.0.0.1:8000/product/contact/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data:{"id":id},
-        })
+        accesscheck()
+        let data = await Callaxios("delete","product/contact/",{"id":id})
+        // axios({
+        //   method: 'delete',
+        //   url: 'http://127.0.0.1:8000/product/contact/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data:{"id":id},
+        // })
         if (data.data.Status===200){
           notifydelete()
           Getcontact()
+        }else{
+          notifyerror("Something went wrong")
         }
       } catch (error) {
         console.log(error)
+        notifyerror("Something went wrong")
       }
     }
     const submitdeletecontact = (itemid) => {
@@ -229,7 +249,7 @@ export default function Admincontact() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Email</b></label>
-                            <input type="text"  className="form-control"  onChange={(e)=>setemail(e.target.value)} defaultValue={selectedcontact ? selectedcontact.email : null}  placeholder="Description" />
+                            <input type="text" required  className="form-control"  onChange={(e)=>setemail(e.target.value)} defaultValue={selectedcontact ? selectedcontact.email : null}  placeholder="Description" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
@@ -249,7 +269,7 @@ export default function Admincontact() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Whatsapp</b></label>
-                            <input type="text"  className="form-control"  onChange={(e)=>setwhatsapp(e.target.value)} defaultValue={selectedcontact ? selectedcontact.whatsapp : null}  placeholder="Description" />
+                            <input type="text" required className="form-control"  onChange={(e)=>setwhatsapp(e.target.value)} defaultValue={selectedcontact ? selectedcontact.whatsapp : null}  placeholder="Description" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>

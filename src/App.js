@@ -20,44 +20,16 @@ import { createBrowserHistory } from 'history';
 
 
 function App() {
-  const history = require("history").createBrowserHistory()
-  var refresh_token = window.localStorage.getItem('refresh_token')
-  useEffect(() =>{
-  let interval = setInterval (() => {
-    // console.log("refre",refresh_token)
-      if (refresh_token) {
-          UpdateToken()
-      }
-      
-        }, 300000 );
-        return ()=> clearInterval(interval)
-      },[]);
-      const UpdateToken=async()=>{
-          try {
-            let data = await axios({
-              method: 'post',
-              url: 'http://127.0.0.1:8000/api/token/refresh/',
-              data:{"refresh" : refresh_token },
-          })
-          console.log("data",data.data)      
-          window.localStorage.setItem('access_token', data.data.access)    
-        } catch (error) {
-          console.log("error",error)
-          // console.log("erro/rmessga",error.response.status)
-          if (error.response.status===401){
-            history.push("/adminlogin")
-          }
-        }
+  
         
-
-        }
   return (
     <div >
-      <Simplecontextprovider>
+      
       <Router>
+      <Simplecontextprovider>
         <Routes>
           
-          <Route exact path='/' element={<Home/>}/>
+          <Route exact path='/' element={<Adminlogin/>}/>
           <Route exact path='adminlogin' element={<Adminlogin/>}/>
           <Route exact path='adminhome' element={<Adminhome/>}/>
           <Route exact path='admindashboard' element={<Admindashboard/>}/>
@@ -71,8 +43,9 @@ function App() {
           {/* <Route exact path='test' element={<Test/>}/> */}
           
         </Routes>
+        </Simplecontextprovider>
       </Router>
-      </Simplecontextprovider>
+      
     </div>
   );
 }

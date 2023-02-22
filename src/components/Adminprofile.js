@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Adminslider from './Adminslider';
 import { Icon } from '@iconify/react';
 import Adminlogout from './Adminlogout';
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
+import { Simplecontext } from './Simplecontext';
 export default function Adminprofile() {
+  const {accesscheck} =useContext(Simplecontext)
   const [profil,setprofile]=useState();
   // const [password,setpassword]=useState();
   // const [modalvalue,setmodalvalue]=useState(false)

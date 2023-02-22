@@ -1,9 +1,12 @@
 import axios from 'axios';
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useContext, useEffect, useRef, useState} from 'react';
 // import { useDownloadExcel } from 'react-export-table-to-excel';
 import { DownloadTableExcel } from 'react-export-table-to-excel';
+import Callaxios from './Callaxios';
+import { Simplecontext } from './Simplecontext';
 
 const Test = () =>  {
+    const {accesscheck} =useContext(Simplecontext)
     const [orderdata,setorderdata]=useState([]);
     const [oproducts,setoproducts]=useState([]);
     var token = window.localStorage.getItem('access_token')
@@ -14,10 +17,15 @@ const Test = () =>  {
     
     const tableRef = useRef(null);
     const orders =async()=>{
+      accesscheck()
         try{
-          let data = await axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
+          let data = await Callaxios("get","product/order/")
+          // axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
           // console.log("data",data.data)
-          setorderdata(data.data)
+          if (data.status===200){
+            setorderdata(data.data)
+          }
+          
         }
         catch (error) {
           console.log(error)
@@ -26,7 +34,8 @@ const Test = () =>  {
       const orderproduct =async(orderid)=>{
         // console.log("ordreid",orderid)
         try{
-          let data = await axios.get("http://127.0.0.1:8000/product/ordererproduct/",{headers:{"Authorization" : `Bearer ${token}`}})
+          let data = await  
+          axios.get("http://127.0.0.1:8000/product/ordererproduct/",{headers:{"Authorization" : `Bearer ${token}`}})
         //   console.log("data",data.data)
         //   data.data.filter(t=>t.order_id.includes(14))
           

@@ -1,34 +1,51 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider'
 import { Icon } from '@iconify/react';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { Simplecontext } from './Simplecontext';
+import Callaxios from './Callaxios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { confirmAlert } from "react-confirm-alert";
+import "react-confirm-alert/src/react-confirm-alert.css";
+
 export default function Adminmissorder() {
-  
+  const {accesscheck} =useContext(Simplecontext)
   const [orderdata,setorderdata]=useState([]);
   const [oproduct,setoproducts]=useState([]);
-  var token = window.localStorage.getItem('access_token')
+  // var token = window.localStorage.getItem('access_token')
 
   useEffect(() => {
    
     missorders()
   }, [])
- 
+  const notifyerror = (msg) => toast.error(msg, {
+    position: "top-center",
+    });
   const missorders =async()=>{
+    accesscheck()
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/missingorder/",{ headers: {"Authorization" : `Bearer ${token}`}})
-      // console.log("moissorderdata",data.data)
-      setorderdata(data.data)
+      let data = await  Callaxios("get","product/missingorder/")
+      // axios.get("http://127.0.0.1:8000/product/missingorder/",{ headers: {"Authorization" : `Bearer ${token}`}})
+      if (data.status===200){
+        setorderdata(data.data)
+      }else{
+        notifyerror("Something went wrong")
+      }
+        
     }
     catch (error) {
       console.log(error)
     }
   }
   const orderproduct =async(orderid)=>{
-    console.log("ordreid",orderid)
+    // console.log("ordreid",orderid)
+    accesscheck()
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/missingorderproduct/",{headers:{"Authorization" : `Bearer ${token}`},params:{"missorder_id":orderid}})
+      let data = await Callaxios("get","product/missingorderproduct/")
+      //  axios.get("http://127.0.0.1:8000/product/missingorderproduct/",{headers:{"Authorization" : `Bearer ${token}`},params:{"missorder_id":orderid}})
       console.log("data",data.data)
       setoproducts(data.data)
     }
@@ -36,27 +53,44 @@ export default function Adminmissorder() {
       console.log(error)
     }
   }
-  const deleteproduct =async(k,id)=>{
+  const deleteproduct =async(id)=>{
     // console.log("k",k)
     // console.log("id",id)
+    accesscheck()
    try {
-    let data = await axios({
-      method: 'delete',
-      url: 'http://127.0.0.1:8000/product/missingorder/',
-      headers:{"Authorization" : `Bearer ${token}`},
-      data:{"id":id},
-
-    });
-    console.log("data",data.data)
-    const splc = orderdata
-    splc.splice(k,1)
-    setorderdata(() => [ ...splc]);
+    let data = await Callaxios("delete","product/missingorder/",{"id":id})
+    
+    if (data.data.Status===200){
+      missorders()
+    }else{
+      notifyerror("Something went wrong")
+    }
+    
+    // const splc = orderdata
+    // splc.splice(k,1)
+    // setorderdata(() => [ ...splc]);
 
    } catch (error) {
     console.log(error)
    }
   }
-  
+  const submitdeletecategory = (itemid) => {
+    confirmAlert({
+      title: "Confirmation",
+      message: `Are you sure to delete this ?`,
+      buttons: [
+        {
+          label: "Yes",           
+          onClick:()=>deleteproduct(itemid),
+        },
+        {
+          label: "No"
+          // onClick: () => alert("Click No")
+        } 
+      ],
+      
+    });
+  };
   return (
     <div >
     <Adminslider/>
@@ -143,7 +177,7 @@ export default function Adminmissorder() {
                     </div>
                     </Dropdown.Menu>           
                     </Dropdown></td>
-                    <td><Icon onClick={()=>deleteproduct(k,itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
+                    <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
                 </tr>
               ))}  
             </tbody>

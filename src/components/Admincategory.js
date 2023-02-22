@@ -9,19 +9,21 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import Callaxios from './Callaxios';
 
 export default function Admincategory() {
-    const {categoryvalue,filteredcategory,setfilteredcategory,Getcategory} =useContext(Simplecontext)
+    const {categoryvalue,filteredcategory,setfilteredcategory,Getcategory,accesscheck} =useContext(Simplecontext)
     // console.log("datcata",categoryvalue)
     const [searchvalue,setsearchvalue]=useState();
     const [modalvalue,setmodalvalue]=useState(false);
     const [selectedcat,setselectedcat]=useState(null);
     const [categoryname,setcategoryname]=useState();
     const [description,setdescription]=useState();
-    var token = window.localStorage.getItem('access_token')
+    // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         setfilteredcategory(categoryvalue)
+        
     }, [])
     const notifydelete = () => toast.success('✅ Deleted Successfully!', {
       position: "top-center",
@@ -42,6 +44,7 @@ export default function Admincategory() {
     }
     const postcategory=async(e,itm)=>{
       e.preventDefault();
+      accesscheck()
       // console.log("e",e)
       // console.log("itm",itm)
       let datalist = {"category_type":categoryname,         
@@ -51,13 +54,14 @@ export default function Admincategory() {
         datalist.id=itm.id
       }
       try {
-        const postdata = await  axios({
-          method: 'post',
-          url: 'http://127.0.0.1:8000/product/category/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data: datalist
-        })
-        // console.log(postdata.data)
+        const postdata =await Callaxios("post","product/category/",datalist)
+        // const postdata = await  axios({
+        //   method: 'post',
+        //   url: 'http://127.0.0.1:8000/product/category/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data: datalist
+        // })
+        console.log(postdata.data)
         setselectedcat()
         if (postdata.data.Status===200){
           setmodalvalue(!modalvalue)
@@ -69,6 +73,7 @@ export default function Admincategory() {
           
         }else if(postdata.data.Status===401){
           console.log("unautherized ")
+          
         }
       } catch (error) {
         console.log(error)
@@ -82,13 +87,15 @@ export default function Admincategory() {
       setdescription();
     }
     const deletecategory = async(id)=>{
+      accesscheck()
       try {
-        let data = await axios({
-          method: 'delete',
-          url: 'http://127.0.0.1:8000/product/category/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data:{"id":id},
-        })
+        let data = await Callaxios("delete","product/category/",{"id":id})
+        //  await axios({
+        //   method: 'delete',
+        //   url: 'http://127.0.0.1:8000/product/category/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data:{"id":id},
+        // })
         if (data.data.Status===200){
           notifydelete()
           Getcategory()

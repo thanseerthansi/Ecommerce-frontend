@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Callaxios from './Callaxios';
+import { BaseURL } from './Url';
 
 export default function Adminlogin () {
     const [username,setusername]=useState();
@@ -11,30 +13,42 @@ export default function Adminlogin () {
     const notifyerror = () => toast.error('! Invalid Password or Username', {
         position: "top-center",
         });
-    const login=(e)=>{
+    const login=async(e)=>{
         e.preventDefault();
-        const data={
+        const datalist={
             "username":username,
             "password":password,
           }   
-        axios({
-            method: 'post',
-            url: 'http://127.0.0.1:8000/api/token/',
-            data:data,
-        }).then(response => {
-            // console.log("response",response);
-            if (response.status === 200){
-                // console.log("pk")
-                window.localStorage.setItem('access_token', response.data.access)
-                window.localStorage.setItem('refresh_token', response.data.refresh) 
-                return navigate('/admindashboard');
-            }
-            else{alert(response.data.Message) }
+          const data =await axios ({
+                method: 'post',
+                url: `${BaseURL}api/token/`,
+                data:data,
             })
-        .catch((error) => {
-        console.log(error)
-        notifyerror()
-        })
+          if(data.status===200){
+            window.localStorage.setItem('access_token', data.data.access)
+            window.localStorage.setItem('refresh_token', data.data.refresh) 
+            return navigate('/admindashboard');
+          }else{
+            notifyerror()
+          }
+        // axios({
+        //     method: 'post',
+        //     url: 'http://127.0.0.1:8000/api/token/',
+        //     data:data,
+        // }).then(response => {
+        //     // console.log("response",response);
+        //     if (response.status === 200){
+        //         // console.log("pk")
+        //         window.localStorage.setItem('access_token', response.data.access)
+        //         window.localStorage.setItem('refresh_token', response.data.refresh) 
+        //         return navigate('/admindashboard');
+        //     }
+        //     else{alert(response.data.Message) }
+        //     })
+        // .catch((error) => {
+        // console.log(error)
+        // notifyerror()
+        // })
         }
   return (
         <div className='bg-dark vh-100 overflow-auto'>

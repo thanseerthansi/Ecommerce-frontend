@@ -8,9 +8,12 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { BaseURL } from './Url';
+import { Simplecontext } from './Simplecontext';
+import Callaxios from './Callaxios';
 
 export default function Admincity() {
-    
+  const {accesscheck} =useContext(Simplecontext)
     // console.log("datcata",categoryvalue)
     const [citydata,setcitydata]=useState([]);
     const [filtercitydata,setfiltercitydata]=useState([]);
@@ -19,7 +22,7 @@ export default function Admincity() {
     const [selectedcat,setselectedcat]=useState(null);
     const [city_name,setcity_name]=useState();
     const [description,setdescription]=useState();
-    var token = window.localStorage.getItem('access_token')
+    // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         Getcity()
@@ -33,13 +36,23 @@ export default function Admincity() {
     const notifyupdated = () => toast.success('✅ Updated Successfully!', {
       position: "top-center",
       });
+    const notifyerror = (msg) => toast.error(msg, {
+      position: "top-center",
+      });
 
     const Getcity=async()=>{
         try{
-            let data = await axios.get("http://127.0.0.1:8000/product/city/",{ headers: {"Authorization" : `Bearer ${token}`}})
+          accesscheck()
+            let data =await Callaxios("get","product/city/")
+            //  await axios.get(`${BaseURL}product/city/`,{ headers: {"Authorization" : `Bearer ${token}`}})
             // console.log("moissorderdata",data.data)
-            setcitydata(data.data)
-            setfiltercitydata(data.data)
+            if (data.status===200){
+              setcitydata(data.data)
+              setfiltercitydata(data.data)
+            }else{
+              notifyerror("Something Went wrong")
+            }
+           
           }
           catch (error) {
             console.log(error)
@@ -55,6 +68,7 @@ export default function Admincity() {
     }
     const postcity=async(e,itm)=>{
       e.preventDefault();
+      accesscheck()
       // console.log("e",e)
       // console.log("itm",itm)
       let datalist = {"city_name":city_name,         
@@ -64,12 +78,13 @@ export default function Admincity() {
         datalist.id=itm.id
       }
       try {
-        const postdata = await  axios({
-          method: 'post',
-          url: 'http://127.0.0.1:8000/product/city/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data: datalist
-        })
+        const postdata = await Callaxios("post","product/city/",datalist)
+        // await  axios({
+        //   method: 'post',
+        //   url: 'http://127.0.0.1:8000/product/city/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data: datalist
+        // })
         // console.log(postdata.data)
         setselectedcat()
         if (postdata.data.Status===200){
@@ -80,6 +95,8 @@ export default function Admincity() {
             notifyadded();
           }else{notifyupdated();}
           
+        }else{
+          notifyerror("Something went wrong")
         }
       } catch (error) {
         console.log(error)
@@ -91,12 +108,14 @@ export default function Admincity() {
     }
     const deletecity = async(id)=>{
       try {
-        let data = await axios({
-          method: 'delete',
-          url: 'http://127.0.0.1:8000/product/city/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data:{"id":id},
-        })
+        accesscheck()
+        let data = await Callaxios("delete","product/city/",{"id":id})
+        //  axios({
+        //   method: 'delete',
+        //   url: 'http://127.0.0.1:8000/product/city/',
+        //   headers:{"Authorization" : `Bearer ${token}`},
+        //   data:{"id":id},
+        // })
         if (data.data.Status===200){
           notifydelete()
           Getcity()

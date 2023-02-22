@@ -10,7 +10,7 @@ import { Simplecontext } from './Simplecontext';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 export default function Adminproduct() {
-
+  
 //   const [orderdata,setorderdata]=useState([]);
   const [productlist,setproductlist]=useState([]);
   const [filteredprduct,setfilteredprduct]=useState([]);
@@ -22,8 +22,8 @@ export default function Adminproduct() {
   const [productvalues,setproductvalues]=useState([]);
   const [images,setimages]=useState([]);
   const [firstimages,setfirstimages]=useState();
-   
-  const {categoryvalue} =useContext(Simplecontext)
+ 
+  const {categoryvalue,accesscheck} =useContext(Simplecontext)
   const imagetolist=(abc)=>{
     // let list = []
     // list.append(abc)
