@@ -26,6 +26,7 @@ export default function Admincity() {
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         Getcity()
+        accesscheck()
     }, [])
     const notifydelete = () => toast.success('✅ Deleted Successfully!', {
       position: "top-center",
@@ -152,11 +153,11 @@ export default function Admincity() {
       </div>
       <div className='col-md-10 col-11'>
       
-      <div className='pt-3 ps-md-5' >
+      <div className='pt-0 ps-md-0' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>
          
           <div className='container pt-md-0 pt-0'>
-          <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+          <div className='d-flex pt-2 ' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="healthicons:city" width="40" height="23" /> <p className='fw-bolder'>Cities</p> 
             </div>
             {/* search view and add new section */}

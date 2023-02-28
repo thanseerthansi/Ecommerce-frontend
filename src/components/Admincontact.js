@@ -28,6 +28,7 @@ export default function Admincontact() {
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         Getcontact()
+        accesscheck()
     }, [])
     const notifydelete = () => toast.success('✅ Deleted Successfully!', {
       position: "top-center",
@@ -111,17 +112,13 @@ export default function Admincontact() {
       setemail();
       setinstagram();
       setwhatsapp();
+
     }
     const deletecontact = async(id)=>{
       try {
         accesscheck()
         let data = await Callaxios("delete","product/contact/",{"id":id})
-        // axios({
-        //   method: 'delete',
-        //   url: 'http://127.0.0.1:8000/product/contact/',
-        //   headers:{"Authorization" : `Bearer ${token}`},
-        //   data:{"id":id},
-        // })
+       
         if (data.data.Status===200){
           notifydelete()
           Getcontact()
@@ -161,11 +158,11 @@ export default function Admincontact() {
       </div>
       <div className='col-md-10 col-11'>
       
-      <div className='pt-3 ps-md-5' >
+      <div className='pt-0 ps-md-0' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>
          
           <div className='container pt-md-0 pt-0'>
-          <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+          <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="bxs:contact" width="40" height="23" /><p className='fw-bolder'>Contact</p> 
             </div>
             {/* search view and add new section */}
@@ -201,7 +198,7 @@ export default function Admincontact() {
                 <td>{itm.whatsapp}</td>
                 <td>{itm.created_date.split('T')[0]}</td>
                 <td><button onClick={()=>setselectedcontact(itm)& setmodalvalue(!modalvalue)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
-                <div className='pt-1 '><button onClick={()=>submitdeletecontact(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
+                <div className='pt-1 '><button onClick={()=>submitdeletecontact(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger  ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
                 </td>
                 
                 {/* <td><Icon  className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
@@ -218,7 +215,7 @@ export default function Admincontact() {
                 <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
             <p className='fw-bolder ps-4'>Add Categories</p> 
             </div>
-                    <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() &allproductnull}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
+                    <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() &allproductnull()}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
                 </div>
                 {/* {idproduct.map((itm,k)=>( */}
                 <div  className="modal-body">
@@ -276,7 +273,7 @@ export default function Admincontact() {
                         </div></div>
                     <div className='p-5 float-end d-flex justify-content-between'> 
                     <div className=''>
-                    <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() & allproductnull}  type='button'  className="btn btn-danger ">close</button>
+                    <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() & allproductnull()}  type='button'  className="btn btn-danger ">close</button>
                     </div>
                     <div className='ps-3'>
                     <button type="submit" className="btn btn-success  ">Save</button>

@@ -10,6 +10,7 @@ export const Simplecontext = createContext();
 export default function Simplecontextprovider({children}) {
     const [categoryvalue,setcategoryvalue]=useState([]);
     const [filteredcategory,setfilteredcategory]=useState([]);
+    
     let navigate = useNavigate();
     useEffect(() => {
       Getcategory()

@@ -22,7 +22,7 @@ export default function Adminlogin () {
           const data =await axios ({
                 method: 'post',
                 url: `${BaseURL}api/token/`,
-                data:data,
+                data:datalist,
             })
           if(data.status===200){
             window.localStorage.setItem('access_token', data.data.access)
@@ -51,17 +51,18 @@ export default function Adminlogin () {
         // })
         }
   return (
-        <div className='bg-dark vh-100 overflow-auto'>
+        <div className='mt-5 vh-100 overflow-auto'>
           <ToastContainer />
           <section className=" gradient-custom">
         <div className="container w-75">
           <div className="row d-flex justify-content-center align-items-center ">
-          <h5 className="fw-bold mt-5  d-flex justify-content-center align-items-center " style={{color:"rgb(251 191 36)"}}>Admin Login</h5>
+          
             <div className="col-12 col-md-8 col-lg-6 col-xl-5">
               <div className="card bg-dark text-white" style={{borderRadius: '1rem'}}>
-                <div className="card-body p-md-5 m-md-2 text-center">
-                
-                  <div className="mb-md-5 mt-md-3 pb-5">
+                <div className="card-body p-md-4 m-md-2 text-center">
+                <img src="/assets/img/logo.jpg" loading="lazy" alt="bisum" />
+                <h5 className="fw-bold  mt-2 d-flex justify-content-center align-items-center " style={{color:"rgb(251 191 36)"}}>Admin Login</h5>
+                  <div className="mb-md-5 mt-md-3 pb-2">
                    
                     <div className="form-outline form-white mb-4">
                       <input type="Name" id="typeEmailX" placeholder='Username' onChange={(e)=>setusername(e.target.value)} className="form-control form-control-md" />

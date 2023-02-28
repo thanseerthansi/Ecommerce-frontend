@@ -9,6 +9,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { Simplecontext } from './Simplecontext';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import Callaxios from './Callaxios';
 export default function Adminproduct() {
   
 //   const [orderdata,setorderdata]=useState([]);
@@ -41,7 +42,7 @@ export default function Adminproduct() {
   }
   // console.log("serav-41",productvalues)
   // console.log("images",images)
-  var token = window.localStorage.getItem('access_token')
+  // var token = window.localStorage.getItem('access_token')
   const filterfunction=()=>{
     if (searchvalue){
       let fvalue = productlist.filter(t=>t.title.toUpperCase().includes(searchvalue.toUpperCase()))
@@ -50,6 +51,7 @@ export default function Adminproduct() {
 }
   useEffect(() => {  
     products()
+    accesscheck()
   }, [])
 
   const notify = () => toast.success('✅ Deleted Successfully!', {
@@ -61,57 +63,66 @@ export default function Adminproduct() {
   const notifyproductadded = () => toast.success('✅ Product added Successfully!', {
     position: "top-center",
     });
-  const notifydelete = () => toast.error(' !! Order exist under this product.!!', {
+  const notifydelete = () => toast.error(' !! Order exist under this product. you can disable this prodcut!!', {
+    position: "top-center",
+    });
+  const notifyerror = (msg) => toast.error(msg, {
     position: "top-center",
     });
   const products =async()=>{
     try{
-      let data = await axios.get("http://127.0.0.1:8000/product/product/",{ headers: {"Authorization" : `Bearer ${token}`}})
-      // console.log("moissorderdata",data.data)
-      setproductlist(data.data)
-      setfilteredprduct(data.data)
+      accesscheck()
+      let data = await Callaxios("get","product/product/")
+      if(data.status===200){
+        setproductlist(data.data)
+        setfilteredprduct(data.data)
+      }
+     
     }
     catch (error) {
       console.log(error)
     }
   }
   const setstatus =async(status,pid)=>{
-    
+    accesscheck()  
       try {
-        let data = await axios({
-          method: 'post',
-          url: 'http://127.0.0.1:8000/product/product/',
-          headers:{"Authorization" : `Bearer ${token}`},
-          data:{ "id":pid,
-                "status":status
-                }
-        })
-        // console.log("response",data.data)
+        
+        let data = await Callaxios("post","product/product/",{ "id":pid,"status":status})
         if (data.data.Status===200){
-            products()
-            
-        }else{console.log(data.data.Message)}
+            products()            
+        }else{
+          // console.log(data.data.Message)
+          notifyerror("Something went wrong ")
+        }
       } catch (error) {
         console.log(error)
       }
      
   }
-  const deleteproduct =async(k,id)=>{
-    // console.log("k",k)
-    // console.log("id",id)
+  const changevat =async(vat,pid)=>{
+    accesscheck()  
+      try {
+        console.log("vat",vat)
+        let data = await Callaxios("post","product/product/",{ "id":pid,"vat":vat})
+        console.log("data",data)
+        if (data.data.Status===200){
+            products()            
+        }else{
+          // console.log(data.data.Message)
+          notifyerror("Something went wrong ")
+        }
+      } catch (error) {
+        console.log(error)
+      }
+     
+  }
+  const deleteproduct =async(id)=>{
+    accesscheck()
    try {
-    let data = await axios({
-      method: 'delete',
-      url: 'http://127.0.0.1:8000/product/product/',
-      headers:{"Authorization" : `Bearer ${token}`},
-      data:{"id":id},
-
-    });
+    let data = await Callaxios("delete","product/product/",{"id":id})
     // console.log("data",data.data)
     if(data.data.Status===200){
-        const splc = productlist
-        splc.splice(k,1)
-        setproductlist(() => [ ...splc]);
+        products()
         notify()  
     }else{console.log("error :",data.data.Message)
     if (data.data.Message==='FOREIGN KEY constraint failed'){
@@ -122,17 +133,15 @@ export default function Adminproduct() {
    }
   }
   const imagedeletefromdb = async(item,k)=>{
-  //  console.log("pid",editproduct.id)
-  //  console.log("id",item.id)
-  //  console.log("k",k)
+    accesscheck()
    try {
-    let data = await axios({
-      method: 'patch',
-      url: 'http://127.0.0.1:8000/product/product/',
-      headers:{"Authorization" : `Bearer ${token}`},
-      data:{"id":editproduct.id,images:JSON.stringify([item.id]),"keyword":"remove"}
-    })
-    console.log("response",data.data)
+    let datalist={"id":editproduct.id,
+                  "images":JSON.stringify([item.id]),
+                  "keyword":"remove"
+                }
+    let data = await Callaxios("patch","product/product/",datalist)
+    
+    // console.log("response",data.data)
     if (data.data.Status===200){
         // console.log("ok")
         products()
@@ -163,14 +172,14 @@ export default function Adminproduct() {
       
     });
   };
-  const submitdeleteproduct = (k,itemid) => {
+  const submitdeleteproduct = (itemid) => {
     confirmAlert({
       title: "Confirmation",
       message: `Are you sure to delete this product ?`,
       buttons: [
         {
           label: "Yes",           
-          onClick:()=>deleteproduct(k,itemid),
+          onClick:()=>deleteproduct(itemid),
         },
         {
           label: "No"
@@ -181,45 +190,28 @@ export default function Adminproduct() {
     });
   };
   const addproduct = async(e,id)=>{
-    // console.log("iddddddd",id)
+    accesscheck()
     e.preventDefault();
     const form_data = new FormData();
-    if (id===null || id===undefined){
-      // console.log("idpassed")   
+    if (id===null || id===undefined){ 
     }else{ 
-      // console.log("elsepssed")
       form_data.append('id',id)}
     if (firstimages){
-      // const listimage = []
-      // console.log("firstimages",firstimages)
+
       let totalimage = images.concat(firstimages)
       // console.log("timage",totalimage)     
       totalimage.map((itm,k)=>{
         form_data.append("images",itm)
       }) 
-      // form_data.append("images",totalimage[0])
-      // form_data.append("images",totalimage[1])
+     
     }
-    // if (images.length!==0){
-    //   images.map((itm,k)=>{
-    //     form_data.append("images",itm)
-    //   })
-    // }
-    console.log("daataa",productvalues)
+   
     for (const [key, value] of Object.entries(productvalues)) {
-      // console.log(`${key}` , `${value}`);
       form_data.append(`${key}`, `${value}`)
     }
     try {
-      const postdata = await  axios({
-        method: 'post',
-        url: 'http://127.0.0.1:8000/product/product/',
-        headers:{"Authorization" : `Bearer ${token}`},
-        data:form_data,
-      })
-      // console.log("postdata",postdata.data)
+      const postdata = await  Callaxios("post","product/product/",form_data)
       if(postdata.data.Status===200){
-        // console.log("id",id)
         if (id===null || id===undefined){
           setmodalvalue(!modalvalue)
           products()
@@ -229,7 +221,7 @@ export default function Adminproduct() {
           notifyproductadded()
           }
         else{ 
-            console.log("elsepssed")
+            // console.log("elsepssed")
             setmodaledit(!modaledit)
             products()   
             setproductvalues([]) 
@@ -237,7 +229,9 @@ export default function Adminproduct() {
             setfirstimages()
             notifyproductupdated()
           }    
-      }else{console.log("postdata.data.Message")}
+      }else{console.log("postdata.data.Message")
+      notifyerror("Something went wrong")
+    }
     } catch (error) {
       console.log(error)
     }
@@ -256,12 +250,12 @@ export default function Adminproduct() {
       </div>
       <div className='col-md-10 col-11'>
       
-      <div className='pt-3 ps-md-5' >
+      <div className='pt-0 ps-md-0' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>       
           {/* <div className='float-right'><button className='btn btn-primary float-end'>Add new</button></div> */}         
           
           <div className='container pt-md-0 pt-0'>
-          <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+          <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="icon-park-twotone:order" width="40" height="23" />  <b>Products List</b> 
           </div>
            {/* filterstart */}
@@ -339,7 +333,8 @@ export default function Adminproduct() {
                 <button onClick={()=>setstatus(false,itm.id)} className='h-auto w-auto rounded text-white p-1 bg-success' >enabled</button>
                  :<button onClick={()=>setstatus(true,itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger'  >disabled</button>}</td>
                 <td><button onClick={()=>setmodaledit(!modaledit)& seteditproduct(itm)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
-                <div className='pt-1 '><button onClick={()=>submitdeleteproduct(k,itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
+                <div className='pt-1 text-sm'><button onClick={()=>changevat(itm.vat? false:true,itm.id)} style={itm.vat?{backgroundColor:"#198754"}:{backgroundColor:"#d32525"}} className='h-auto w-auto rounded text-white p-1  ' ><Icon icon="ic:twotone-remove-red-eye"  width="20" height="20" />VAT</button></div>
+                <div className='pt-1 '><button onClick={()=>submitdeleteproduct(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger  ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
                 </td>
                   
                 </tr>

@@ -23,7 +23,7 @@ export default function Admincategory() {
     // console.log("dsecrip",categoryname)
     useEffect(() => {
         setfilteredcategory(categoryvalue)
-        
+        accesscheck()
     }, [])
     const notifydelete = () => toast.success('✅ Deleted Successfully!', {
       position: "top-center",
@@ -61,7 +61,7 @@ export default function Admincategory() {
         //   headers:{"Authorization" : `Bearer ${token}`},
         //   data: datalist
         // })
-        console.log(postdata.data)
+        // console.log(postdata.data)
         setselectedcat()
         if (postdata.data.Status===200){
           setmodalvalue(!modalvalue)
@@ -132,11 +132,11 @@ export default function Admincategory() {
       </div>
       <div className='col-md-10 col-11'>
       
-      <div className='pt-3 ps-md-5' >
+      <div className='pt-0 ps-md-0' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>
          
           <div className='container pt-md-0 pt-0'>
-          <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+          <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
             <Icon icon="mdi:package-variant-remove" width="40" height="25" /> <p className='fw-bolder'>Categories</p> 
             </div>
             {/* search view and add new section */}

@@ -19,14 +19,24 @@ export default function Adminorder() {
   const [orderdata,setorderdata]=useState([]);
   const [ordersearchdata,setordersearchdata]=useState([]);
   const [filter,setfilter]=useState(1);
-  const [oproduct,setoproducts]=useState([]);
+  const [citydata,setcitydata]=useState([]);
   const [searchvalue,setsearchvalue]=useState();
   const tableRef = useRef(null);
-  // const [editorder,seteditorder]=useState([]);
-  // const [statusvalue,setstatusvalue]=useState();
-
+  const [modalvalue,setmodalvalue]=useState(false)
+  const [productdata,setproductdata]=useState([]);
+  const [product,setproduct]=useState()
+  const [quantity,setquantity]=useState()
+  const [name,setname]=useState()
+  const [address,setaddress]=useState()
+  const [city,setcity]=useState()
+  const [mobile,setmobile]=useState()
+  const [filteredproduct,setfilteredproduct]=useState();
+  const arr = new Array(10).fill(0)
   // console.log("statusvalue",statusvalue)
   const notify = () => toast.success('✅ Deleted Successfully!', {
+    position: "top-center",
+    });
+  const notifyadd = (msg) => toast.success(msg, {
     position: "top-center",
     });
   const statusnotify = () => toast.success('✅ Status Updated Successfully!', {
@@ -35,11 +45,11 @@ export default function Adminorder() {
     const notifyerror = (msg) => toast.error(msg, {
       position: "top-center",
       });
-  // var token = window.localStorage.getItem('access_token')
-  // console.log("token",token)
+
   useEffect(() => {
     status()
     orders()
+    accesscheck()
     // orderproduct()
    
   }, [])
@@ -47,8 +57,6 @@ export default function Adminorder() {
     try{
       accesscheck()
       let data = await Callaxios("get","product/status/")
-      // axios.get("http://127.0.0.1:8000/product/status/",{headers:{"Authorization" : `Bearer ${token}`}})
-      // console.log(data.data)
       if (data.status===200){
         setfilterstatus(data.data)
         setfilter([])
@@ -65,7 +73,6 @@ export default function Adminorder() {
     accesscheck()
     try{
       let data = await Callaxios("get","product/order/")
-      // axios.get("http://127.0.0.1:8000/product/order/",{headers:{"Authorization" : `Bearer ${token}`}})
       // console.log("data",data.data)
       if (data.status===200){
         setorderdata(data.data)
@@ -77,18 +84,49 @@ export default function Adminorder() {
       console.log(error)
     }
   }
-  // const orderproduct =async()=>{
-  //   // console.log("ordreid",orderid)
-  //   try{
-  //     let data = await axios.get("http://127.0.0.1:8000/product/ordererproduct/",{headers:{"Authorization" : `Bearer ${token}`}})
-  //     // console.log("data",data.data)
-  //     setoproducts(data.data)
-  //   }
-  //   catch (error) {
-  //     console.log(error)
-  //   }
-  // }
- 
+  const postorder=async(e)=>{
+    accesscheck()
+    e.preventDefault();
+    try {
+      // console.log("product",productdata)
+      // let price = productdata.filter(t=>t.id===parseInt(product)  )
+      // let productprice = price[0]?.price??""
+      // console.log("price",productprice)
+      const datalist = {
+        product :product,
+        customer_name :name,
+        delivery_address:address,
+        quantity:quantity.split('-')[0],
+        city:city,
+        contact:mobile,
+        purchasestatus:"new",
+        total:quantity.split('-')[1]
+      }
+      let data = await Callaxios("post","product/order/",datalist)
+      console.log("datapost",data)
+      if(data.data.Status===200){
+        notifyadd("Added Successfully")
+        setmodalvalue(!modalvalue)
+        orders()
+        setallnull()
+      }else{
+        notifyerror("Something Went Wrong ")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  const Getproduct =async()=>{
+    try {
+      let data = await Callaxios("get","product/product/")
+      if (data.status===200){
+        setproductdata(data.data)
+      }
+    } catch (error) {
+      
+    }
+  }
+  
   const deleteproduct =async(id)=>{
     // console.log("k",k)
     // console.log("id",id)
@@ -99,42 +137,27 @@ export default function Adminorder() {
         orders()
       }
     }
-    //  axios({
-    //   method: 'delete',
-    //   url: 'http://127.0.0.1:8000/product/order/',
-    //   headers:{"Authorization" : `Bearer ${token}`},
-    //   data:{"id":id},
-
-    // }).then(response => {
-    //   if (response.data.Status===200){
-    //     // console.log("data",response.data)
-    //     const splc = orderdata
-    //     // console.log("array",splc[k])
-    //     splc.splice(k,1)
-    //     setorderdata(() => [ ...splc]);
-    //     notify()
-    //   }else{console.log(response.data.Message)}
-    //   })
-    //   .catch(err => console.warn("error",err));   
-    //   };
+  const Getcity=async()=>{
+    try {
+      let data =await Callaxios("get","product/city/")
+      // console.log("datacity",data)
+      if (data.status===200){
+        setcitydata(data.data)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
     const changestatus=async(itmid,statusname)=>{
       accesscheck()
-      // console.log("itm",itmid)
-      // console.log("item",statusname)
       let list = { "id":itmid,
         "purchasestatus":statusname
         }
       
       try {
         let data = await Callaxios("post","product/order/",list)
-        // axios({
-        //   method: 'post',
-        //   url: 'http://127.0.0.1:8000/product/order/',
-        //   headers:{"Authorization" : `Bearer ${token}`},
-        //   data:list
-        // })
-        // console.log("response",data.data)
+       
         if (data.data.Status===200){
           orders()
           statusnotify()
@@ -150,7 +173,7 @@ export default function Adminorder() {
       
     }
     const filterfunction=()=>{
-      console.log("sdfdfsd",searchvalue)
+      // console.log("sdfdfsd",searchvalue)
       if (searchvalue){
       let searchid=searchvalue.split('Z')[1]
         let fvalue = orderdata.filter(t=>parseInt(t.id) === parseInt(searchid))
@@ -175,7 +198,22 @@ export default function Adminorder() {
       
     });
   };
+  const setallnull=()=>{
+    setproduct('')
+    setquantity('')
+    setaddress('')
+    setcity('')
+    setmobile('')
+    setname('')
+  }
 
+  const filterproduct =(id)=>{
+    
+    const productvalue = productdata.filter(t=>t.id===parseInt(id))[0]
+    // console.log("productvalue",productvalue.price_list?"data":"none")
+    setfilteredproduct(productvalue)
+  }
+  // console.log("dtaquannit",quantity)
   return (
     <div >
     <Adminslider/>
@@ -187,9 +225,9 @@ export default function Adminorder() {
       <div className='col-md-2 col-1'>
       </div>
       <div className='col-md-10 col-11'>
-      <div className='pt-3 ps-md-5' >
+      <div className='pt-0 ps-md-0' >
           <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>
-          <div className='d-flex p-3' style={{color:"rgb(245, 189, 7)"}}>
+          <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="icon-park-twotone:order" width="40" height="23" /> <p className='fw-bolder'> Orders</p>
           </div>
          
@@ -206,7 +244,7 @@ export default function Adminorder() {
                     </svg>
                   </span>
                 </div>
-                <ul className="sorting-lists list-unstyled md-10 w-auto ">
+                <ul className="sorting-lists list-unstyled md-10 w-auto text-center">
                   <li  className="text_14" style={{backgroundColor:"white",padding:"4px",borderRadius:"3px"}} onClick={()=>setfilter([])}> All </li>
                   {filterstatus.map((itm,k)=>(
                       <li onClick={()=>setfilter(itm)} key={k}><span  style={{backgroundColor:itm.color,padding:"4px",borderRadius:"3px"}} className="text_14">{itm.status}</span></li>
@@ -222,7 +260,7 @@ export default function Adminorder() {
               <div className=' d-flex w-100  border ps-1 rounded'>
               <i className='pt-1' ><Icon icon="ant-design:search-outlined" width="20" height="20" /></i>
             <input type="Name" id="typeEmailX" placeholder='Search Order by SN no' onChange={(e)=>setsearchvalue(e.target.value)}  className="form-control border-0 form-control-sm " />
-            <button className='btn-sm btn-warning' onClick={filterfunction} ><Icon icon="ant-design:search-outlined" width="20" height="20" /></button>
+            <button className='btn-sm btn-warning  ' onClick={filterfunction} ><Icon icon="ant-design:search-outlined" width="20" height="20" /></button>
             </div>
             
             </div>
@@ -235,27 +273,32 @@ export default function Adminorder() {
                     currentTableRef={tableRef.current}
                 >
                 <div className='ps-4 '>
-                <button  className='btn-sm btn-info text-white float-end'  > Export to excel </button>
+                <button  className='btn-sm btn-danger text-white float-end'  > Export to excel </button>
                 </div>
               </DownloadTableExcel>
               {/* excel export button end */}
                 </div>
+                <div className=''>
+                  <button onClick={()=>setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='btn-sm btn-info text-white float-end'>Add New</button>
+                </div>
           </div>
           
-          <div className='container pt-md-3 pt-2'>
-          <table className="table table-bordered">
-            <thead className='text-center'>
+          <div className='container pt-md-2 pt-2'>
+          <table className="table table-bordered vh-100  overflow-auto">
+            <thead className='text-center '>
                 <tr>
                 <th scope="col">#</th>
                 <th scope="col ">SN.No</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Contact</th>
+                <th scope="col">quantity</th>
+                <th scope="col">Product</th>
                 <th scope="col">Price</th>
                 <th scope="col">Address</th>
                 <th scope="col">city</th>
                 <th scope="col">Status</th>
                 <th scope="col">Date</th>
-                <th scope="col">Products</th>
+                
                 {/* <th scope="col">Save</th> */}
                 <th scope="col">Delete</th>
                 </tr>
@@ -267,6 +310,8 @@ export default function Adminorder() {
                 <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                 <td>{itm.customer_name}</td>
                 <td>{itm.contact}</td>
+                <td>{itm.quantity}</td>
+                <td  >{itm.product?itm.product[0].title:""}</td>
                 <td>{itm.total}</td>
                 <td>{itm.delivery_address}</td>
                 <td>{itm.city}</td>
@@ -277,7 +322,7 @@ export default function Adminorder() {
                   <div>
                   <select defaultValue={''}  onChange={(e)=>changestatus(itm.id,e.target.value)} >
                         {filterstatus ? <>
-                          <option value={''} disabled>change status</option>
+                          <option value={''} hidden>change status</option>
 
                             {filterstatus.map((item,k)=>(
                             <option  key={k} value={item.status} style={{backgroundColor:item.color,padding:"4px",borderRadius:"3px"}} >{item.status}</option>
@@ -287,58 +332,9 @@ export default function Adminorder() {
                   </div>
                  
                   </td>
-                  <td>{itm.created_date.split('T')[0]}</td>
-                <td className='text-muted' style={{width:"0"}}><Dropdown >
-                    <Dropdown.Toggle   >
-                    <Icon  icon="eva:list-fill" width="15" height="25" />
                   
-                    </Dropdown.Toggle>
-                    <Dropdown.Menu style={{width:"150%"}}>
-                    <div className="dropdown-menu dropdown-menu-xl dropdown-menu-end p-0 dropdown-menu-cart show" aria-labelledby="page-header-cart-dropdown" style={{position: 'absolute', inset: '0px 0px auto auto', margin: 0, transform: 'translate3d(0px, -30px, 0px)'}} data-popper-placement="bottom-end">
-
-                    <div data-simplebar="init" style={{maxHeight: 300}}><div className="simplebar-wrapper" style={{margin: 0}}><div className="simplebar-height-auto-observer-wrapper"><div className="simplebar-height-auto-observer" /></div><div className="simplebar-placeholder" style={{width: 'auto', height: "auto"}} /></div><div className="simplebar-track simplebar-horizontal" style={{visibility: 'hidden'}}><div className="simplebar-scrollbar" style={{width: 0, display: 'none'}} /></div><div className="simplebar-track simplebar-vertical" style={{visibility: 'visible'}}><div className="simplebar-scrollbar" style={{height:" auto", display: 'block', transform: 'translate3d(0px, 0px, 0px)'}} /></div></div>
-                    <div className="p-1 border-bottom-0 border-start-0 border-end-0 border-dashed border" id="checkout-elem" style={{display: 'block'}}>
-                        {/* <div className="card-body p-4"> */}
-                    <div className="p-1 mt-4">
-                    <div className="">     
-                        <div className="card-body" >
-                        <div className=" table-card">   
-                        <table className="table table-nowrap table-centered align-middle" style={{backgroundColor:"white"}}>
-                            <thead className="bg-light text-muted">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Product</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Quantity</th>
-                                               
-                            </tr>
-                            {/* end tr */}  
-                            </thead>{/* thead */}
-                            <tbody>  
-                            {oproduct.filter(t=>parseInt(t.order_id[0].id) === parseInt(itm.id)).map((productitm,k1)=>(
-                                < tr key={k1}>
-                                
-                                    <td className="">{k1+1}</td>
-                                    <td className="">{productitm.product[0].title}<br/></td>
-                                    <td className="">{productitm.subtotal}</td>
-                                    <td className="">{productitm.quantity}</td>           
-                                           
-                                </tr>
-                                ))}
-                          
-                            </tbody>{/* end tbody */}
-                        </table>{/* end table */}
-                        
-                        </div>
-                        </div>    
-                    </div>
-                    </div>
-                    {/* </div> */}  
-                    </div>
-                    </div>  
-                    </Dropdown.Menu>
-            
-                    </Dropdown></td>
+                  <td>{Date(itm.created_date).split('+')[0]}</td>
+                  
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
                     <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
                     
@@ -359,12 +355,14 @@ export default function Adminorder() {
                     <th scope="col">SN.No</th>
                     <th scope="col">Customer</th>
                     <th scope="col">Contact</th>
+                    <th scope="col">Products</th>
+                    <th scope="col">quantity</th>
                     <th scope="col">Price</th>
                     <th scope="col">Address</th>
                     <th scope="col">city</th>
                     <th scope="col">Status</th>
                     <th scope="col">Date</th>
-                    <th scope="col">Products</th>
+                    
                     </tr>
                     {(filter.length===0 ? ordersearchdata :ordersearchdata.filter(t=>parseInt(t.status[0].id) === parseInt(filter.id))) .map((itm,k)=>(
                         <tr key={k}>
@@ -372,26 +370,128 @@ export default function Adminorder() {
                             <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                             <td>{itm. customer_name}</td>
                             <td>{itm.contact}</td>
+                            <td>{itm.product?itm.product.title:""} </td>
+                            <td>{itm.quantity}</td>
                             <td>{itm.total}</td>
                             <td>{itm.delivery_address}</td>
                             <td>{itm.city}</td>
                             <td >{itm.status[0].status}</td>
                             <td>{itm.created_date.split('T')[0]}</td>
-                            <td>
-                                {/* {itm.id} */}
-                                {oproduct.filter(t=>parseInt(t.order_id[0].id) === parseInt(itm.id)).map((productitm,k1)=>(
-                                    
-                                        <li key={k1}>{productitm.product[0].title} - {productitm.quantity} - {productitm.subtotal} </li>   
-                                
-                                ))}
-                            </td>
+                            
                         </tr>
                     ))}
                    
                     
                   </tbody>
                 </table>
-
+                
+                <div className="modal fade show"  tabIndex={-1} id="quickview-modal" aria-modal="true" role="dialog" style={modalvalue ? {display: 'block', paddingLeft: "20%",paddingRight:"2%"}:{display:'none'}}>
+            <div className="modal-dialog modal-dialog-centered modal-xl w-md-50">
+                <div className="modal-content">
+                <div className="modal-header border-0">
+                <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+            <p className='fw-bolder ps-4'>Add Order</p> 
+            </div>
+                    <button onClick={()=>setmodalvalue(!modalvalue)& setallnull()}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
+                </div>
+                {/* {idproduct.map((itm,k)=>( */}
+                <div  className="modal-body">
+                <form  onSubmit={(e)=>postorder(e)} >
+             
+                <div className="row col-12">
+                  <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>product<span className='text-danger'>*</span></b></label>
+                            <select required onChange={(e)=>setproduct(e.target.value) & filterproduct(e.target.value)} value={product} className='form-control w-full'>
+                              <option value='' hidden >Select Product</option>
+                              {productdata ? productdata.map((pitm,pk)=>(
+                                <option key={pk} value={pitm.id}>{pitm.title}</option>
+                              )) :null}
+                            </select>
+                            {/* <input type="text" required className="form-control"   placeholder="Category Name" /> */}
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>
+                    </div>
+                    </div>
+                    
+                  <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>Quantity<span className='text-danger'>*</span></b></label>
+                            <select required onChange={(e)=>setquantity(e.target.value)}   value={quantity} className='form-control w-full'>
+                              <option value='' hidden >Select quantity</option>
+                              {filteredproduct? filteredproduct.price_list?filteredproduct.price_list.split(',').map((pitm,pk)=>(
+                                <option key={pk} value={pitm}>{pitm} AED</option>
+                              )):Array(10).fill(0).map((itm,k)=>(
+                                <option key={k} value= {`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`}  >{`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`} AED</option>
+                              ))
+                               :null}
+                            </select>
+                            {/* <input type="number" required onChange={(e)=>setquantity(e.target.value)} value={quantity} className="form-control"  placeholder="Enter Quantity" /> */}
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                    
+                        <div className="col-6">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>Address</b></label>
+                            <input type="text" required onChange={(e)=>setaddress(e.target.value)} value={address}  className="form-control"    placeholder="Enter Address" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                 
+                        <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputmobile"><b>Name</b></label>
+                            <input type="text" required onChange={(e)=>setname(e.target.value) }  value={name} className="form-control"   placeholder="Enter Name" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                        <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputmobile"><b>Mobile</b></label>
+                            <input type="number" required onChange={(e)=>setmobile(e.target.value)} value={mobile} className="form-control"   placeholder="Enter Mobile" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                     
+                        <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>city</b></label>
+                            <select required onChange={(e)=>setcity(e.target.value)} value={city} className='form-control w-full'>
+                              <option value='' hidden >Select City</option>
+                              {citydata ? citydata.map((citm,ck)=>(
+                                <option key={ck} value={citm.city_name}>{citm.city_name}</option>
+                              )) :null}
+                            </select>
+                            {/* <input type="text" required className="form-control"   placeholder="Enter city" /> */}
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div></div>
+                    <div className='p-5 float-end d-flex justify-content-between'> 
+                    <div className=''>
+                    <button onClick={()=>setmodalvalue(!modalvalue) & setallnull()}  type='button'  className="btn btn-danger ">close</button>
+                    </div>
+                    <div className='ps-3'>
+                    <button type="submit" className="btn btn-success  ">Save</button>
+                    </div>
+                    </div>
+                    </form>
+                </div>
+                {/* ))} */}
+                </div>
+            </div>
+            </div>
 </div>
   )
 }

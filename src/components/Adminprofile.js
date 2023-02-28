@@ -5,26 +5,26 @@ import Adminlogout from './Adminlogout';
 import jwt_decode from "jwt-decode";
 import axios from 'axios';
 import { Simplecontext } from './Simplecontext';
+import { BaseURL } from './Url';
 export default function Adminprofile() {
   const {accesscheck} =useContext(Simplecontext)
   const [profil,setprofile]=useState();
   // const [password,setpassword]=useState();
   // const [modalvalue,setmodalvalue]=useState(false)
   // const [time, setTime] = useState(0);
-  var token = window.localStorage.getItem('access_token')
-  // var refresh_token = window.localStorage.getItem('refresh_token')
-  var decoded = jwt_decode(token);
-  let userid = decoded.user_id
+  
   // console.log("id",userid)
   useEffect(() => {
     userdata()
-    
+    accesscheck()
   },[]);
 
-
+  var token = window.localStorage.getItem('access_token')
+  var decoded = jwt_decode(token);
+  let userid = decoded.user_id
   // let headers = "Bearer "+token 
   // console.log("headre",headers)
-  const userdata=()=>{axios.get("http://127.0.0.1:8000/user/user/",{ headers: {"Authorization" : `Bearer ${token}`},params:{id:userid}}).then(response=>{
+  const userdata=()=>{axios.get(`]${BaseURL}user/user/`,{ headers: {"Authorization" : `Bearer ${token}`},params:{id:userid}}).then(response=>{
    
     // console.log("data",response.data)
     setprofile(response.data);

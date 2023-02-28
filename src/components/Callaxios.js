@@ -1,6 +1,6 @@
 import axios from 'axios'
-import React, { useContext } from 'react'
-import { Simplecontext } from './Simplecontext'
+// import React, { useContext } from 'react'
+// import { Simplecontext } from './Simplecontext'
 import { BaseURL } from './Url'
 
 export default async function Callaxios(action,url,datalist) {
@@ -9,15 +9,15 @@ export default async function Callaxios(action,url,datalist) {
     try {
         
         // accesscheck()
-        console.log("action",action)
-        console.log("url",BaseURL+url)
+        // console.log("action",datalist)
+        // console.log("url",BaseURL+url)
         let data
         const token = window.localStorage.getItem('access_token')
         if (action === "get"){
 
             data = await axios.get(BaseURL+url,{params:datalist})
         }else{
-            console.log("postdata")
+            // console.log("postdata")
             data = await axios(
                 {
                     method:action,
@@ -26,7 +26,7 @@ export default async function Callaxios(action,url,datalist) {
                     data:datalist
                 }
             )
-            console.log("data",data)
+            // console.log("data",data)
         }
         
         return data

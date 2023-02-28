@@ -15,6 +15,7 @@ export default function Admindashboard() {
   // var token = window.localStorage.getItem('access_token')
   useEffect(() => {
    orders()
+   accesscheck()
 
   }, [])
   const notifyerror = (msg) => toast.error(msg, {
@@ -54,7 +55,7 @@ export default function Admindashboard() {
           <div className='col-2'>
           </div>
           <div className='col-10 '>
-          <div className='pt-3' >
+          <div className='pt-0' >
               <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>
               <div className='container p-5'>
                {/* data start */}
