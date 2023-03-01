@@ -11,19 +11,24 @@ import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Callaxios from './Callaxios';
 
-export default function Admincategory() {
-    const {categoryvalue,filteredcategory,setfilteredcategory,Getcategory,accesscheck} =useContext(Simplecontext)
+export default function Adminstatus() {
+    const {accesscheck} =useContext(Simplecontext)
     // console.log("datcata",categoryvalue)
+    const [filteredstatus,setfilteredstatus]=useState();
     const [searchvalue,setsearchvalue]=useState();
+    const [statusdata,setstatusdata]=useState([]);
     const [modalvalue,setmodalvalue]=useState(false);
     const [selectedcat,setselectedcat]=useState(null);
-    const [categoryname,setcategoryname]=useState();
+    const [statusname,setstatusname]=useState();
     const [description,setdescription]=useState();
+    const [color,setcolor]=useState(false);
+    const [isloading,setisloading]=useState();
     // var token = window.localStorage.getItem('access_token')
-    // console.log("dsecrip",categoryname)
+    // console.log("dsecrip",statusname)
     useEffect(() => {
-        setfilteredcategory(categoryvalue)
+        
         accesscheck()
+        Getstatus()
     }, [])
     const notifydelete = () => toast.success('✅ Deleted Successfully!', {
       position: "top-center",
@@ -34,30 +39,50 @@ export default function Admincategory() {
     const notifyupdated = () => toast.success('✅ Updated Successfully!', {
       position: "top-center",
       });
-      const notifyerror = (msg) => toast.error(msg, {
-        position: "top-center",
-        });
+    const notifyerror = (msg) => toast.error(msg, {
+      position: "top-center",
+      });
+    const Getstatus=async()=>{
+      try{
+        accesscheck()
+        let data = await Callaxios("get","product/status/")
+        // console.log(data)
+        if (data.status===200){
+          setstatusdata(data.data)
+          setfilteredstatus(data.data)
+          
+        }else{
+          notifyerror("Something went wrong")
+        }
+        
+      }
+      catch (error) {
+        console.log(error)
+      } 
+    }
     const filterfunction=()=>{
         // console.log("sdfdfsd",searchvalue)
         if (searchvalue){
-          let fvalue = categoryvalue.filter(t=>t.category_type.toUpperCase().includes(searchvalue.toUpperCase()))
-          setfilteredcategory(fvalue)
+          let fvalue = statusdata.filter(t=>t.status.toUpperCase().includes(searchvalue.toUpperCase()))
+          setfilteredstatus(fvalue)
         }
-        else{setfilteredcategory(categoryvalue)}
+        else{setfilteredstatus(statusdata)}
     }
-    const postcategory=async(e,itm)=>{
+    const poststatus=async(e,itm)=>{
       e.preventDefault();
       accesscheck()
+      setisloading(true)
       // console.log("e",e)
       // console.log("itm",itm)
-      let datalist = {"category_type":categoryname,         
+      let datalist = {"status":statusname,         
           "description":description,
+          "color":color
           }          
       if(itm){
         datalist.id=itm.id
       }
       try {
-        const postdata =await Callaxios("post","product/category/",datalist)
+        const postdata =await Callaxios("post","product/status/",datalist)
         // const postdata = await  axios({
         //   method: 'post',
         //   url: 'http://127.0.0.1:8000/product/category/',
@@ -68,7 +93,8 @@ export default function Admincategory() {
         setselectedcat()
         if (postdata.data.Status===200){
           setmodalvalue(!modalvalue)
-          Getcategory()
+          Getstatus()
+          setisloading(false)
           
           if (itm ){
             notifyadded();
@@ -76,23 +102,26 @@ export default function Admincategory() {
           
         }else if(postdata.data.Status===401){
           console.log("unautherized ")
-          
-        }else{notifyerror("Something went Wrong")}
+          setisloading(false)
+        }else{notifyerror("Something went Wrong")
+        setisloading(false)
+      }
       } catch (error) {
         console.log(error)
         if(error.response.Status===401){
           console.log("unautherized ")
+          setisloading(false)
         }
       }
     }
     const allproductnull=()=>{
-      setcategoryname();
+      setstatusname();
       setdescription();
     }
     const deletecategory = async(id)=>{
       accesscheck()
       try {
-        let data = await Callaxios("delete","product/category/",{"id":id})
+        let data = await Callaxios("delete","product/status/",{"id":id})
         //  await axios({
         //   method: 'delete',
         //   url: 'http://127.0.0.1:8000/product/category/',
@@ -101,13 +130,13 @@ export default function Admincategory() {
         // })
         if (data.data.Status===200){
           notifydelete()
-          Getcategory()
+          Getstatus()
         }
       } catch (error) {
         console.log(error)
       }
     }
-    const submitdeletecategory = (itemid) => {
+    const submitdeletestatus = (itemid) => {
       confirmAlert({
         title: "Confirmation",
         message: `Are you sure to delete this Category ?`,
@@ -140,7 +169,7 @@ export default function Admincategory() {
          
           <div className='container pt-md-0 pt-0'>
           <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
-            <Icon icon="mdi:package-variant-remove" width="40" height="25" /> <p className='fw-bolder'>Categories</p> 
+            <Icon icon="mdi:package-variant-remove" width="40" height="25" /> <p className='fw-bolder'>Status</p> 
             </div>
             {/* search view and add new section */}
             <div className='row col-12'>
@@ -148,7 +177,7 @@ export default function Admincategory() {
               <div className=' d-flex w-100  border ps-1 rounded'>
               <i className='pt-1' ><Icon icon="ant-design:search-outlined" width="20" height="20" /></i>
             <input type="Name" id="typeEmailX" placeholder='Search Category'  onChange={(e)=>setsearchvalue(e.target.value)} className="form-control border-0 form-control-sm " />
-            {/* {searchvalue? <button onClick={()=>setsearchvalue() & setfilteredcategory(categoryvalue)} className='d-flex btn-sm btn-danger'>{searchvalue}<Icon icon="ic:twotone-cancel" width="30" height="20" /></button> :null} */}
+            {/* {searchvalue? <button onClick={()=>setsearchvalue() & setfilteredstatus(categoryvalue)} className='d-flex btn-sm btn-danger'>{searchvalue}<Icon icon="ic:twotone-cancel" width="30" height="20" /></button> :null} */}
             <button className='btn-sm btn-warning' onClick={filterfunction}  ><Icon icon="ant-design:search-outlined" width="20" height="20" /></button>
             </div>
             
@@ -161,7 +190,8 @@ export default function Admincategory() {
             <thead className='text-center'>
                 <tr>
                 <th scope="col">#</th>
-                <th scope="col">Category Name</th>
+                <th scope="col">Status Name</th>
+                <th scope="col">color</th>
                 <th scope="col">Description</th>
                 <th scope="col">Created on</th>
                 <th scope="col">Action</th>
@@ -169,19 +199,20 @@ export default function Admincategory() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {filteredcategory.map((itm,k)=>(
+              {filteredstatus?filteredstatus.map((itm,k)=>(
                 <tr key={k} >
                 <th scope="row">{k+1}</th>
-                <td>{itm.category_type}</td>
+                <td>{itm.status}</td>
+                <td ><span className='rounded' style={{backgroundColor:itm.color,padding:"4px",color:"white"}}>{itm.color}</span></td>
                 <td>{itm.description}</td>
                 <td>{itm.created_date.split('T')[0]}</td>
                 <td><button onClick={()=>setselectedcat(itm)& setmodalvalue(!modalvalue)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
-                <div className='pt-1 '><button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
+                <div className='pt-1 '><button onClick={()=>submitdeletestatus(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
                 </td>
                 
                 {/* <td><Icon  className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
                 </tr>
-              ))}   
+              )):null}   
             </tbody>
             </table>
           </div>
@@ -191,19 +222,26 @@ export default function Admincategory() {
                 <div className="modal-content">
                 <div className="modal-header border-0">
                 <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
-            <p className='fw-bolder ps-4'>Add Categories</p> 
+            <p className='fw-bolder ps-4'>Add Status</p> 
             </div>
                     <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcat() &allproductnull}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
                 </div>
                 {/* {idproduct.map((itm,k)=>( */}
                 <div  className="modal-body">
-                <form  onSubmit={(e)=>postcategory(e,selectedcat)}>
+                <form  onSubmit={(e)=>poststatus(e,selectedcat)}>
              
                 
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Category Name<span className='text-danger'>*</span></b></label>
-                            <input type="text" required className="form-control" onChange={(e)=>setcategoryname(e.target.value)} defaultValue={selectedcat ? selectedcat.category_type : null}  placeholder="Category Name" />
+                            <input type="text" required className="form-control" onChange={(e)=>setstatusname(e.target.value)} defaultValue={selectedcat ? selectedcat.status : null}  placeholder="Category Name" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>
+                    </div>
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>color<span className='text-danger'>*</span></b></label>
+                            <input type="color" required className="form-control" onChange={(e)=>setcolor(e.target.value)} defaultValue={selectedcat ? selectedcat.color : null}  placeholder="Category Name" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     </div>
@@ -211,7 +249,7 @@ export default function Admincategory() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Description</b></label>
-                            <textarea type="text" required className="form-control"  onChange={(e)=>setdescription(e.target.value)} defaultValue={selectedcat ? selectedcat.description : null}  placeholder="Description" />
+                            <textarea type="text"  className="form-control"  onChange={(e)=>setdescription(e.target.value)} defaultValue={selectedcat ? selectedcat.description : null}  placeholder="Description" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     

@@ -74,6 +74,10 @@ export default function Adminslider() {
             <Link  to="/admincontact" className="link-light" data-key="t-analytics">
             <Icon icon="bxs:contact" width="38" height="23" /><span>Contact</span>
                  </Link></li>
+            <li role='button'  className=' d-flex text-white mt-3' >
+            <Link  to="/status" className="link-light" data-key="t-analytics">
+            <Icon icon="gridicons:stats-up-alt" width="38" height="23" /><span>Status</span>
+                 </Link></li>
         </ul>
         </div>
         </>

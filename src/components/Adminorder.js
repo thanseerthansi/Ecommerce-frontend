@@ -247,7 +247,7 @@ export default function Adminorder() {
                 <ul className="sorting-lists list-unstyled md-10 w-auto text-center">
                   <li  className="text_14" style={{backgroundColor:"white",padding:"4px",borderRadius:"3px"}} onClick={()=>setfilter([])}> All </li>
                   {filterstatus.map((itm,k)=>(
-                      <li onClick={()=>setfilter(itm)} key={k}><span  style={{backgroundColor:itm.color,padding:"4px",borderRadius:"3px"}} className="text_14">{itm.status}</span></li>
+                      <li onClick={()=>setfilter(itm)} key={k}><span  style={{backgroundColor:itm.color,padding:"4px",borderRadius:"3px",color:"white",fontWeight:"500"}} className="text_14">{itm.status}</span></li>
                   ))}
                 </ul>
               </div>
@@ -284,7 +284,7 @@ export default function Adminorder() {
           </div>
           
           <div className='container pt-md-2 pt-2'>
-          <table className="table table-bordered vh-100  overflow-auto">
+          <table className="table table-bordered   overflow-auto">
             <thead className='text-center '>
                 <tr>
                 <th scope="col">#</th>
@@ -305,7 +305,7 @@ export default function Adminorder() {
             </thead>
             <tbody className='text-center'>
               {(filter.length===0 ? ordersearchdata :ordersearchdata.filter(t=>parseInt(t.status[0].id) === parseInt(filter.id))) .map((itm,k)=>(
-                <tr key={k}>
+                <tr key={k} className="">
                 <th scope="row">{k+1}</th>
                 <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                 <td>{itm.customer_name}</td>
@@ -317,7 +317,7 @@ export default function Adminorder() {
                 <td>{itm.city}</td>
                 <td className='pt-3 '>
                   <div>
-                  <span style={{backgroundColor:itm.status[0].color,padding:"5px",borderRadius:"4px"}}>{itm.status[0].status}</span>
+                  <span className='font-bold' style={{backgroundColor:itm.status[0].color,padding:"5px",borderRadius:"4px",color:"white",fontWeight:"500"}}>{itm.status[0].status}</span>
                   </div><br/>
                   <div>
                   <select defaultValue={''}  onChange={(e)=>changestatus(itm.id,e.target.value)} >

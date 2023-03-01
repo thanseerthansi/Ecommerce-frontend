@@ -16,6 +16,7 @@ import Adminprofile from "./components/Adminprofile";
 import Home from './components/Home';
 import Simplecontextprovider from "./components/Simplecontext";
 import { createBrowserHistory } from 'history';
+import Adminstatus from "./components/Adminstatus";
 
 
 
@@ -40,6 +41,7 @@ function App() {
           <Route exact path='admincategory' element={<Admincategory/>}/>
           <Route exact path='admincity' element={<Admincity/>}/>
           <Route exact path='admincontact' element={<Admincontact/>}/>
+          <Route exact path='status' element={<Adminstatus/>}/>
           {/* <Route exact path='test' element={<Test/>}/> */}
           
         </Routes>
