@@ -102,9 +102,9 @@ export default function Adminproduct() {
   const changevat =async(vat,pid)=>{
     accesscheck()  
       try {
-        console.log("vat",vat)
+        // console.log("vat",vat)
         let data = await Callaxios("post","product/product/",{ "id":pid,"vat":vat})
-        console.log("data",data)
+        // console.log("data",data)
         if (data.data.Status===200){
             products()            
         }else{

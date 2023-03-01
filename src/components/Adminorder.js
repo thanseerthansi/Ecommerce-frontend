@@ -333,7 +333,7 @@ export default function Adminorder() {
                  
                   </td>
                   
-                  <td>{Date(itm.created_date).split('+')[0]}</td>
+                  <td >{(itm.created_date).split('T')[0]}</td>
                   
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
                     <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
