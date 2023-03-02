@@ -31,17 +31,17 @@ function App() {
         <Routes>
           
           <Route exact path='/' element={<Adminlogin/>}/>
-          <Route exact path='adminlogin' element={<Adminlogin/>}/>
-          <Route exact path='adminhome' element={<Adminhome/>}/>
-          <Route exact path='admindashboard' element={<Admindashboard/>}/>
-          <Route exact path='adminprofile' element={<Adminprofile/>}/>
-          <Route exact path='adminorder' element={<Adminorder/>}/>
-          <Route exact path='adminmissorder' element={<Adminmissorder/>}/>
-          <Route exact path='adminproduct' element={<Adminproduct/>}/>
-          <Route exact path='admincategory' element={<Admincategory/>}/>
-          <Route exact path='admincity' element={<Admincity/>}/>
-          <Route exact path='admincontact' element={<Admincontact/>}/>
-          <Route exact path='status' element={<Adminstatus/>}/>
+          <Route  path='adminlogin' element={<Adminlogin/>}/>
+          <Route  path='adminhome' element={<Adminhome/>}/>
+          <Route  path='admindashboard' element={<Admindashboard/>}/>
+          <Route  path='adminprofile' element={<Adminprofile/>}/>
+          <Route  path='adminorder' element={<Adminorder/>}/>
+          <Route  path='adminmissorder' element={<Adminmissorder/>}/>
+          <Route  path='adminproduct' element={<Adminproduct/>}/>
+          <Route  path='admincategory' element={<Admincategory/>}/>
+          <Route  path='admincity' element={<Admincity/>}/>
+          <Route  path='admincontact' element={<Admincontact/>}/>
+          <Route  path='status' element={<Adminstatus/>}/>
           {/* <Route exact path='test' element={<Test/>}/> */}
           
         </Routes>

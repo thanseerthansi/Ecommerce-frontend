@@ -12,6 +12,7 @@ import { Simplecontext } from './Simplecontext';
 import Callaxios from './Callaxios';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
+import { BaseURL, imageURL } from './Url';
 
 export default function Adminorder() {
   const {accesscheck} =useContext(Simplecontext)
@@ -31,8 +32,11 @@ export default function Adminorder() {
   const [city,setcity]=useState()
   const [mobile,setmobile]=useState()
   const [filteredproduct,setfilteredproduct]=useState();
+  const [detailmodal,setdetailmodal]=useState(false);
+  const [productitm,setproductitm]=useState()
   const arr = new Array(10).fill(0)
-  // console.log("statusvalue",statusvalue)
+
+  console.log("productitm",productitm)
   const notify = () => toast.success('✅ Deleted Successfully!', {
     position: "top-center",
     });
@@ -89,9 +93,12 @@ export default function Adminorder() {
     e.preventDefault();
     try {
       // console.log("product",productdata)
-      // let price = productdata.filter(t=>t.id===parseInt(product)  )
-      // let productprice = price[0]?.price??""
-      // console.log("price",productprice)
+      let datap = productdata.filter(t=>t.id===parseInt(product)  )
+      let vat = datap[0]?.vat.toString()??""
+      let deliverycharge = datap[0]?.delivery_charge??""
+      let vatprice =vat?parseInt(price*0.05):0 
+
+      let price = quantity.split('-')[1]
       const datalist = {
         product :product,
         customer_name :name,
@@ -100,7 +107,9 @@ export default function Adminorder() {
         city:city,
         contact:mobile,
         purchasestatus:"new",
-        total:quantity.split('-')[1]
+        price: price,
+        delivery_charge:deliverycharge,
+        total:price+deliverycharge+vatprice
       }
       let data = await Callaxios("post","product/order/",datalist)
       console.log("datapost",data)
@@ -289,12 +298,13 @@ export default function Adminorder() {
                 <tr>
                 <th scope="col">#</th>
                 <th scope="col ">SN.No</th>
+                <th scope="col">Product</th>
                 <th scope="col">Customer</th>
                 <th scope="col">Contact</th>
-                <th scope="col">quantity</th>
-                <th scope="col">Product</th>
-                <th scope="col">Price</th>
-                <th scope="col">Address</th>
+                {/* <th scope="col">quantity</th> */}
+                
+                {/* <th scope="col">Price</th> */}
+                {/* <th scope="col">Address</th> */}
                 <th scope="col">city</th>
                 <th scope="col">Status</th>
                 <th scope="col">Date</th>
@@ -307,13 +317,17 @@ export default function Adminorder() {
               {(filter.length===0 ? ordersearchdata :ordersearchdata.filter(t=>parseInt(t.status[0].id) === parseInt(filter.id))) .map((itm,k)=>(
                 <tr key={k} className="">
                 <th scope="row">{k+1}</th>
-                <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+                <td   style={{cursor: "pointer"}} onClick={()=>setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+                <td className='flex text-start'>
+                  {itm.product?itm.product[0].title:""}<br/>
+                  <img className='rounded  ' style={{width:"50px"}} src={itm.product[0].images[0] ?imageURL+itm.product[0].images[0].image :null} alt="product" />
+                  </td>
                 <td>{itm.customer_name}</td>
                 <td>{itm.contact}</td>
-                <td>{itm.quantity}</td>
-                <td  >{itm.product?itm.product[0].title:""}</td>
-                <td>{itm.total}</td>
-                <td>{itm.delivery_address}</td>
+                {/* <td>{itm.quantity}</td> */}
+                
+                {/* <td>{itm.total}</td> */}
+                {/* <td>{itm.delivery_address}</td> */}
                 <td>{itm.city}</td>
                 <td className='pt-3 '>
                   <div>
@@ -353,9 +367,10 @@ export default function Adminorder() {
                   <tbody>
                     <tr>
                     <th scope="col">SN.No</th>
+                    <th scope="col">Products</th>
                     <th scope="col">Customer</th>
                     <th scope="col">Contact</th>
-                    <th scope="col">Products</th>
+                    
                     <th scope="col">quantity</th>
                     <th scope="col">Price</th>
                     <th scope="col">Address</th>
@@ -368,9 +383,10 @@ export default function Adminorder() {
                         <tr key={k}>
                            
                             <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+                            <td>{itm.product?itm.product.title:""} </td>
                             <td>{itm. customer_name}</td>
                             <td>{itm.contact}</td>
-                            <td>{itm.product?itm.product.title:""} </td>
+                            
                             <td>{itm.quantity}</td>
                             <td>{itm.total}</td>
                             <td>{itm.delivery_address}</td>
@@ -492,6 +508,82 @@ export default function Adminorder() {
                 </div>
             </div>
             </div>
+            <div className="modal fade show" tabIndex={-1} id="quickview-modal" aria-modal="true" role="dialog" style={detailmodal ? {display: 'block', paddingLeft: "20%",paddingRight:"2%"}:{display:"none"}}>
+            <div className="modal-dialog modal-dialog-centered modal-xxl w-md-50">
+                <div className="modal-content">
+                <div className="modal-header border-0 pb-0">
+                <div className='d-flex pt-0 ' style={{color:"rgb(245, 189, 7)"}}>
+            <p className='fw-bolder ps-2'>Order Details</p> 
+            </div>
+                    <button  onClick={()=>setdetailmodal(!detailmodal)&setproductitm('')} type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
+                </div>
+                {/* {idproduct.map((itm,k)=>( */}
+                <div  className="modal-body  ">
+                  <div>
+                    <b>OrderNo / Date : </b><span> SN{productitm?productitm.created_date.split('T')[1].split('.')[1] +productitm.id:null} / {productitm?productitm.created_date.split('T')[0]:null} </span><b></b><br/>
+                    <b>Customer : </b><span> {productitm?productitm.customer_name:null}</span><br/>
+                    <b>Address : </b><span> {productitm?productitm.delivery_address:null}</span><br/>
+                  </div>
+               <table className="border-collapse border border-slate-500 ... w-100">
+                <thead>
+                  <tr className='text-center'>
+                    <th className="border border-slate-600 ... text-start p-2">Product</th>
+                    <th className="border border-slate-600 ...  p-2">Color</th>
+                    <th className="border border-slate-600 ...  p-2">Size</th>
+                    <th className="border border-slate-600 ...p-2">U_Price</th>
+                    <th className="border border-slate-600 ...p-2">Quantity</th>
+                    <th className="border border-slate-600 ...p-2">Delivery</th>
+                    <th className="border border-slate-600 ...p-2">VAT</th>
+                    
+                    <th className="border border-slate-600 ...p-2">Total</th>
+                    <th className="border border-slate-600 ...p-2">Action</th>
+                  </tr>
+                </thead>
+                  <tbody>
+                    <tr className='text-center'>
+                      <td className="border border-slate-700 ... text-start p-2">{productitm?productitm.product[0].title:null}<br/>
+                      <img className='rounded  ' style={{width:"50px"}} src={productitm ? productitm.product[0].images[0] ?imageURL+productitm.product[0].images[0].image :null:null} alt="product" />
+                      </td>
+                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, color:e.target.value })} value={productitm?(productitm.color===null?"":productitm.color):""} placeholder="color"></input></td>
+                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, size:e.target.value })} value={productitm?(productitm.size===0?"":productitm.size):""} placeholder="size"></input></td>
+                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, price:e.target.value })} value={productitm?(productitm.price):""}></input></td>
+                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, quantity:e.target.value })} value={productitm?(productitm.quantity):""}></input></td>
+                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, delivery_charge:e.target.value })} value={productitm?(productitm.delivery_charge):""}></input></td>
+                      <td className="border border-slate-700 ...">{productitm?(productitm.price*0.05).toFixed():null}</td>
+                      
+                      <td className="border border-slate-700 ...">{productitm?productitm.total:null}</td>
+                      <td className="border border-slate-700 ..."><button className='h-auto w-auto rounded text-white p-1 bg-warning ' ><Icon icon="material-symbols:save-as-outline" width="20" height="20" /> Save</button></td>
+                    </tr>
+                    <tr  >
+                      <td colSpan={3} className="border border-slate-700 ... p-2">Delivery Note : </td>
+                      <td colSpan={6} className="border border-slate-700 ..."></td>
+                    </tr>
+                    <tr  >
+                      <td colSpan={3} className="border border-slate-700 ... p-2">Price: </td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm?productitm.price*productitm.quantity:null}</td>
+                    </tr>
+                    <tr  >
+                      <td colSpan={3} className="border border-slate-700 ... p-2">Shipping Fee: </td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm?productitm.delivery_charge:null}</td>
+                    </tr>
+                    <tr  >
+                      <td colSpan={3} className="border border-slate-700 ... p-2">VAT: </td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm?productitm.product[0].vat?productitm.price*0.05:0:null}</td>
+                    </tr>
+                    <tr  >
+                      <td colSpan={3} className="border border-slate-700 ... p-2">Total: </td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm ? ((productitm.price*productitm.quantity)+productitm.delivery_charge+(productitm.product[0].vat?productitm.price*0.05:0) ).toFixed() :null}</td>
+                    </tr>
+                    
+                  </tbody>
+                </table>
+
+
+                </div>
+                {/* ))} */}
+                </div>
+            </div>
+            </div> 
 </div>
   )
 }

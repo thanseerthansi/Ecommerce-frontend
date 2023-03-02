@@ -311,8 +311,8 @@ export default function Adminproduct() {
                 <tr key={k}>
                 <th scope="row">{k+1}</th>
                 <td>
-                    <div className='d-flex-col '>{itm.title}<br/>
-                <img className='rounded w-50'  src={itm.images[0] ? itm.images[0].image :null} alt={itm.title} />
+                    <div className='d-flex-col text-start'>{itm.title}<br/>
+                <img className='rounded w-25'  src={itm.images[0] ? itm.images[0].image :null} alt={itm.title} />
                 </div>
                 </td>   
                 <td>

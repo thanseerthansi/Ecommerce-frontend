@@ -15,7 +15,8 @@ export default function Adminlogin () {
         });
     const login=async(e)=>{
         e.preventDefault();
-        const datalist={
+        try {
+          const datalist={
             "username":username,
             "password":password,
           }   
@@ -31,6 +32,10 @@ export default function Adminlogin () {
           }else{
             notifyerror()
           }
+        } catch (error) {
+          notifyerror()
+        }
+       
         // axios({
         //     method: 'post',
         //     url: 'http://127.0.0.1:8000/api/token/',

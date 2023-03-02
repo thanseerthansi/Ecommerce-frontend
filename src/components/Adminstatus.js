@@ -72,11 +72,14 @@ export default function Adminstatus() {
       e.preventDefault();
       accesscheck()
       setisloading(true)
+      if (color){
+
+      
       // console.log("e",e)
       // console.log("itm",itm)
-      let datalist = {"status":statusname,         
-          "description":description,
-          "color":color
+      let datalist = {status:statusname,         
+          description:description,
+          color:color,
           }          
       if(itm){
         datalist.id=itm.id
@@ -89,12 +92,13 @@ export default function Adminstatus() {
         //   headers:{"Authorization" : `Bearer ${token}`},
         //   data: datalist
         // })
-        // console.log(postdata.data)
+        console.log(postdata.data)
         setselectedcat()
         if (postdata.data.Status===200){
           setmodalvalue(!modalvalue)
           Getstatus()
           setisloading(false)
+          setcolor('')
           
           if (itm ){
             notifyadded();
@@ -113,10 +117,12 @@ export default function Adminstatus() {
           setisloading(false)
         }
       }
+    }else{notifyerror("select color")}
     }
     const allproductnull=()=>{
       setstatusname();
       setdescription();
+      setcolor('')
     }
     const deletecategory = async(id)=>{
       accesscheck()
@@ -206,7 +212,7 @@ export default function Adminstatus() {
                 <td ><span className='rounded' style={{backgroundColor:itm.color,padding:"4px",color:"white"}}>{itm.color}</span></td>
                 <td>{itm.description}</td>
                 <td>{itm.created_date.split('T')[0]}</td>
-                <td><button onClick={()=>setselectedcat(itm)& setmodalvalue(!modalvalue)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
+                <td><button onClick={()=>setselectedcat(itm)&setcolor(itm.color) & setmodalvalue(!modalvalue)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
                 <div className='pt-1 '><button onClick={()=>submitdeletestatus(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div>
                 </td>
                 
@@ -234,14 +240,14 @@ export default function Adminstatus() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Category Name<span className='text-danger'>*</span></b></label>
-                            <input type="text" required className="form-control" onChange={(e)=>setstatusname(e.target.value)} defaultValue={selectedcat ? selectedcat.status : null}  placeholder="Category Name" />
+                            <input type="text" required className="form-control" onChange={(e)=>setstatusname(e.target.value)} defaultValue={selectedcat ? selectedcat.status : ''}  placeholder="Category Name" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     </div>
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>color<span className='text-danger'>*</span></b></label>
-                            <input type="color" required className="form-control" onChange={(e)=>setcolor(e.target.value)} defaultValue={selectedcat ? selectedcat.color : null}  placeholder="Category Name" />
+                            <input type="color" required className="form-control" onChange={(e)=>setcolor(e.target.value)} value={color}  placeholder="Category Name" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     </div>
@@ -249,7 +255,7 @@ export default function Adminstatus() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Description</b></label>
-                            <textarea type="text"  className="form-control"  onChange={(e)=>setdescription(e.target.value)} defaultValue={selectedcat ? selectedcat.description : null}  placeholder="Description" />
+                            <textarea type="text"  className="form-control"  onChange={(e)=>setdescription(e.target.value)} defaultValue={selectedcat ? selectedcat.description : ''}  placeholder="Description" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     
@@ -261,7 +267,8 @@ export default function Adminstatus() {
                     <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcat() & allproductnull}  type='button'  className="btn btn-danger ">close</button>
                     </div>
                     <div className='ps-3'>
-                    <button type="submit" className="btn btn-success  ">Save</button>
+                      {isloading ? <p>Loading...</p>:
+                    <button type="submit" className="btn btn-success  ">Save</button>}
                     </div>
                     </div>
                     </form>
