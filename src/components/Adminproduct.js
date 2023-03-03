@@ -23,6 +23,7 @@ export default function Adminproduct() {
   const [productvalues,setproductvalues]=useState([]);
   const [images,setimages]=useState([]);
   const [firstimages,setfirstimages]=useState();
+  const [isloading,setisloading]=useState(false)
  
   const {categoryvalue,accesscheck} =useContext(Simplecontext)
   const imagetolist=(abc)=>{
@@ -85,6 +86,7 @@ export default function Adminproduct() {
   }
   const setstatus =async(status,pid)=>{
     accesscheck()  
+    
       try {
         
         let data = await Callaxios("post","product/product/",{ "id":pid,"status":status})
@@ -130,6 +132,7 @@ export default function Adminproduct() {
     } 
    } catch (error) {
     console.log(error)
+    notifyerror("Something Went Wrong")
    }
   }
   const imagedeletefromdb = async(item,k)=>{
@@ -191,6 +194,7 @@ export default function Adminproduct() {
   };
   const addproduct = async(e,id)=>{
     accesscheck()
+    setisloading(true)
     e.preventDefault();
     const form_data = new FormData();
     if (id===null || id===undefined){ 
@@ -211,29 +215,33 @@ export default function Adminproduct() {
     }
     try {
       const postdata = await  Callaxios("post","product/product/",form_data)
+      // console.log("postdata",postdata)
       if(postdata.data.Status===200){
         if (id===null || id===undefined){
           setmodalvalue(!modalvalue)
-          products()
-          setproductvalues([]) 
-          setimages([])
-          setfirstimages()
-          notifyproductadded()
+          
+          
           }
         else{ 
             // console.log("elsepssed")
             setmodaledit(!modaledit)
-            products()   
-            setproductvalues([]) 
-            setimages([])
-            setfirstimages()
-            notifyproductupdated()
-          }    
+           
+            
+          }
+        products()
+        setproductvalues([]) 
+        setimages([])
+        setfirstimages()
+        notifyproductadded()
+        setisloading(false)    
       }else{console.log("postdata.data.Message")
       notifyerror("Something went wrong")
+      setisloading(false)
     }
     } catch (error) {
       console.log(error)
+      notifyerror("Something Went Wrong")
+      setisloading(false)
     }
   }
   
@@ -360,7 +368,7 @@ export default function Adminproduct() {
                         <select defaultValue={''} onChange={(e)=> setproductvalues({...productvalues,category:e.target.value}) } required className='form-control'  >
                           <option value=''  hidden disabled>-select Category-</option>
                           {categoryvalue.map((itm,k)=>(
-                            <option key={k} value={itm.id}>{itm.category_type}</option>
+                            <option key={k} value={itm.id}>{itm.category_type.toUpperCase()}</option>
                           ))}
                         
                         </select>
@@ -388,7 +396,7 @@ export default function Adminproduct() {
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Size</b></label>
-                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  placeholder="Size sepperate by ," />
+                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  placeholder="Size separate by ," />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
@@ -437,13 +445,13 @@ export default function Adminproduct() {
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
-                      <label ><b>Price List<span className='text-danger'>*</span></b></label>
-                      <input type="text" required className="form-control" onChange={(e)=> setproductvalues({...productvalues,price_list:e.target.value})}  placeholder="quantity-price Eg:1-50,2-100" />
+                      <label ><b>Price List</b></label>
+                      <input type="text"  className="form-control" onChange={(e)=> setproductvalues({...productvalues,price_list:e.target.value})}  placeholder="quantity-price Eg:1-50,2-100" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Color</b></label>
-                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  placeholder="Color Sepperate by ," />
+                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  placeholder="Color separate by ," />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
@@ -494,11 +502,14 @@ export default function Adminproduct() {
                 </div>
                 <div className='p-5 float-end d-flex justify-content-between'> 
                 <div className=''>
-                <button type='button' onClick={()=>setmodalvalue(!modalvalue)& setproductvalues([]) & setimages([]) &setfirstimages()} className="btn btn-danger ">close</button>
+                <button type='button' onClick={()=>setmodalvalue(!modalvalue)& setproductvalues([]) & setimages([]) &setfirstimages()} className="btn btn-danger ">Close</button>
                 </div>
                 <div className='ps-3'>
                 <button type="submit" className="btn btn-success  ">Save</button>
-                </div>
+                </div><br/>
+                {isloading ? <div className='text-end'>
+                  <p>Loading...</p>
+                </div>:null}
                 </div>
                 </form>
               </div>
@@ -524,51 +535,51 @@ export default function Adminproduct() {
                       <div className="form-group pt-1">
                         <label htmlFor="exampleInputEmail1"><b>Category<span className='text-danger'>*</span></b></label>
                         <select defaultValue={''} onChange={(e)=> setproductvalues({...productvalues,category:e.target.value}) }  className='form-control'  >
-                          <option value='' hidden disabled>{editproduct? editproduct.category[0].category_type :null}</option>
+                          <option value='' hidden disabled>{editproduct? editproduct.category[0].category_type.toUpperCase() :null}</option>
                           {categoryvalue.map((itm,k)=>(
-                            <option key={k} value={itm.id}>{itm.category_type}</option>
+                            <option key={k} value={itm.id}>{itm.category_type.toUpperCase()}</option>
                           ))}                        
                         </select>
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Brand<span className='text-danger'>*</span></b></label>
-                        <input type="text"  className="form-control" onChange={(e)=> setproductvalues({...productvalues,brand:e.target.value}) }  defaultValue={editproduct? editproduct.brand:null} />
+                        <input type="text"  className="form-control" onChange={(e)=> setproductvalues({...productvalues,brand:e.target.value}) }  defaultValue={editproduct? editproduct.brand:null} placeholder="Brand" />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Code<span className='text-danger'>*</span></b></label>
-                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,code:e.target.value}) } defaultValue={editproduct? editproduct.code:null} />
+                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,code:e.target.value}) } defaultValue={editproduct? editproduct.code:null} placeholder="Code" />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Price<span className='text-danger'>*</span></b></label>
-                        <input type="number" className="form-control" onChange={(e)=> setproductvalues({...productvalues,price:e.target.value})} required  defaultValue={editproduct? editproduct.price:null} />
+                        <input type="number" className="form-control" onChange={(e)=> setproductvalues({...productvalues,price:e.target.value})} required  defaultValue={editproduct? editproduct.price:null}  placeholder="Price"/>
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Old Price<span className='text-danger'>*</span></b></label>
-                        <input type="number" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,old_price:e.target.value})}   defaultValue={editproduct? editproduct.old_price:null} />
+                        <input type="number" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,old_price:e.target.value})}   defaultValue={editproduct? editproduct.old_price:null} placeholder="Old Price" />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Size</b></label>
-                        <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  defaultValue={editproduct? editproduct.size:null} />
+                        <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  defaultValue={editproduct? editproduct.size:null} placeholder="Size Separate by ," />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor=""><b>Quantity<span className='text-danger'>*</span></b></label>
-                        <input type="number" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,quantity:e.target.value})}  defaultValue={editproduct? editproduct.quantity:null} />
+                        <input type="number" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,quantity:e.target.value})}  defaultValue={editproduct? editproduct.quantity:null} placeholder="Quantity" />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor=""><b>Fake Order Sold</b></label>
-                        <input type="number" className="form-control" onChange={(e)=> setproductvalues({...productvalues,Fake_order_sold:e.target.value})} defaultValue={editproduct? editproduct.Fake_order_sold:null}/>
+                        <input type="number" className="form-control" onChange={(e)=> setproductvalues({...productvalues,Fake_order_sold:e.target.value})} defaultValue={editproduct? editproduct.Fake_order_sold:null} placeholder="Fake Order Sold"/>
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor=""><b>Description</b></label>
-                        <textarea type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,description:e.target.value})}  defaultValue={editproduct? editproduct.description:null}/>
+                        <textarea type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,description:e.target.value})}  defaultValue={editproduct? editproduct.description:null} placeholder="Descrpition" />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
@@ -600,42 +611,42 @@ export default function Adminproduct() {
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Title</b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,title:e.target.value})}   defaultValue={editproduct? editproduct.title:null} />
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,title:e.target.value})}   defaultValue={editproduct? editproduct.title:null} placeholder="Title" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Purchase price</b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,purchase_price:e.target.value})}   defaultValue={editproduct? editproduct.purchase_price:null} />
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,purchase_price:e.target.value})}   defaultValue={editproduct? editproduct.purchase_price:null}  placeholder="Purchase List" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Price List<span className='text-danger'>*</span></b></label>
-                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,price_list:e.target.value})} placeholder='quantity-price Eg:1-50,2-100' defaultValue={editproduct? editproduct.price_list:null} />
+                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,price_list:e.target.value})} placeholder='quantity-price Eg:1-50,2-100' defaultValue={editproduct? editproduct.price_list:null}  />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Color</b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  defaultValue={editproduct? editproduct.color:null} />
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  defaultValue={editproduct? editproduct.colour:null} placeholder="Color" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Delivery charges</b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,delivery_charge:e.target.value})}  defaultValue={editproduct? editproduct.delivery_charge:null} />
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,delivery_charge:e.target.value})}  defaultValue={editproduct? editproduct.delivery_charge:null} placeholder="Delivery Charge" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Quantity Text</b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,quanity_text:e.target.value})}  defaultValue={editproduct? editproduct.quantity_text:null} />
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,quanity_text:e.target.value})}  defaultValue={editproduct? editproduct.quantity_text:null} placeholder="Quantity Text" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Rank<span className='text-danger'>*</span></b></label>
-                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,rank:e.target.value})}   defaultValue={editproduct? editproduct.rank:null}/>
+                      <input type="text" className="form-control" onChange={(e)=> setproductvalues({...productvalues,rank:e.target.value})}   defaultValue={editproduct? editproduct.rank:null} placeholder="Rank" />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Status</b></label>
-                      <select defaultValue={''} onChange={(e)=> setproductvalues({...productvalues,status:e.target.value})} className='form-control'  >
+                      <select defaultValue={editproduct? editproduct.status:null} required onChange={(e)=> setproductvalues({...productvalues,status:e.target.value})} className='form-control' placeholder='Status'  >
                           <option value='' hidden disabled>{editproduct? editproduct.status===true?"Enabled":"Disabled":null} </option>
                           <option value='True' >Enabled </option>
                           <option value='False' >Disabled </option>                         
@@ -682,6 +693,9 @@ export default function Adminproduct() {
                 <div className='ps-3 '>
                 <button type="submit" className="btn btn-info  "><span className='text-white'>Save</span></button>
                 </div>
+                {isloading ? <div className='text-end'>
+                  <p>Loading...</p>
+                </div>:null}
                 </div>
                 </form>
               </div>

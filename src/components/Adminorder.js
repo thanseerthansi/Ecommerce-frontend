@@ -45,6 +45,10 @@ export default function Adminorder() {
 
     // restore the original page contents
     document.body.innerHTML = originalContents;
+    setTimeout(function() {
+      window.location.reload();
+    }, 1000);
+
   };
   // console.log("mobile",mobile)
   const notify = () => toast.success('✅ Deleted Successfully!', {
@@ -136,7 +140,7 @@ export default function Adminorder() {
         purchasestatus:"new",
         price: price,
         delivery_charge:deliverycharge,
-        total:price+deliverycharge+vatprice
+        // total:price+deliverycharge+vatprice
       }
       msg ="Saved Successfully"
       }
@@ -411,7 +415,7 @@ export default function Adminorder() {
                   
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
                     <td>
-                      <button onClick={()=>productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" /> Edit</button>
+                      <button onClick={()=>productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" /> Edit</button><br/>
                       <button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button>
                       {/* <Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
                       </td>
