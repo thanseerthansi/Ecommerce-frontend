@@ -388,7 +388,7 @@ export default function Adminproduct() {
                       </div>
                       <div className="form-group pt-2">
                         <label htmlFor="exampleInputEmail1"><b>Size</b></label>
-                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  placeholder="Size" />
+                        <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,size:e.target.value})}  placeholder="Size sepperate by ," />
                         {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                       </div>
                       <div className="form-group pt-2">
@@ -443,7 +443,7 @@ export default function Adminproduct() {
                     </div>
                     <div className="form-group pt-2">
                       <label ><b>Color</b></label>
-                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  placeholder="Color" />
+                      <input type="text" className="form-control"  onChange={(e)=> setproductvalues({...productvalues,colour:e.target.value})}  placeholder="Color Sepperate by ," />
                       {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                     </div>
                     <div className="form-group pt-2">

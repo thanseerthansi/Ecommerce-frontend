@@ -35,8 +35,18 @@ export default function Adminorder() {
   const [detailmodal,setdetailmodal]=useState(false);
   const [productitm,setproductitm]=useState()
   const arr = new Array(10).fill(0)
+  const componentRef = useRef();
+  const handlePrint = () => {
+    const originalContents = document.body.innerHTML;
+    const printContents = componentRef.current.innerHTML;
+    document.body.innerHTML = printContents;
+    // print the component
+    window.print();
 
-  console.log("productitm",productitm)
+    // restore the original page contents
+    document.body.innerHTML = originalContents;
+  };
+  // console.log("mobile",mobile)
   const notify = () => toast.success('✅ Deleted Successfully!', {
     position: "top-center",
     });
@@ -93,13 +103,30 @@ export default function Adminorder() {
     e.preventDefault();
     try {
       // console.log("product",productdata)
-      let datap = productdata.filter(t=>t.id===parseInt(product)  )
-      let vat = datap[0]?.vat.toString()??""
-      let deliverycharge = datap[0]?.delivery_charge??""
-      let vatprice =vat?parseInt(price*0.05):0 
-
-      let price = quantity.split('-')[1]
-      const datalist = {
+      
+      
+      let datalist
+      let msg
+      if(productitm.id){
+        datalist = {
+          id:productitm.id,
+          product :product,
+          customer_name :name,
+          delivery_address:address, 
+          city:city,
+          contact:mobile,
+        
+        }
+        msg ="Updated Successfully"
+      }else{
+        
+        let datap = productdata.filter(t=>t.id===parseInt(product)  )
+        let price = quantity.split('-')[1]
+        let vat = datap[0]?.vat.toString()??""
+        let deliverycharge = datap[0]?.delivery_charge??""
+        let vatprice =vat?parseInt(price*0.05):0 
+        
+       datalist = {
         product :product,
         customer_name :name,
         delivery_address:address,
@@ -111,10 +138,13 @@ export default function Adminorder() {
         delivery_charge:deliverycharge,
         total:price+deliverycharge+vatprice
       }
+      msg ="Saved Successfully"
+      }
+      
       let data = await Callaxios("post","product/order/",datalist)
-      console.log("datapost",data)
+      // console.log("datapost",data)
       if(data.data.Status===200){
-        notifyadd("Added Successfully")
+        notifyadd(msg)
         setmodalvalue(!modalvalue)
         orders()
         setallnull()
@@ -208,6 +238,7 @@ export default function Adminorder() {
     });
   };
   const setallnull=()=>{
+    setproductitm('')
     setproduct('')
     setquantity('')
     setaddress('')
@@ -215,12 +246,41 @@ export default function Adminorder() {
     setmobile('')
     setname('')
   }
-
+  const productedithandler=(itm)=>{
+    // console.log("contac",itm)
+    setproductitm(itm)
+    setproduct(itm.product[0].id)
+    setquantity(itm.quantity)
+    setaddress(itm.delivery_address)
+    setcity(itm.city)
+    setmobile(itm.contact)
+    setname(itm.customer_name)
+  }
   const filterproduct =(id)=>{
     
     const productvalue = productdata.filter(t=>t.id===parseInt(id))[0]
     // console.log("productvalue",productvalue.price_list?"data":"none")
     setfilteredproduct(productvalue)
+  }
+  const saveproducthandler=async()=>{
+    accesscheck()
+    console.log("productitm",productitm)
+    try {
+      let datalist =Object.assign({}, productitm);
+      delete datalist['product']
+      delete datalist['status']
+      // console.log("datalist",datalist)
+      let data = await Callaxios("post","product/order/",datalist) 
+      // console.log("data",data)
+      if(data.data.Status===200){
+        notifyadd("Saved Successfully")
+        orders()
+      }else{
+        notifyerror("Something went wrong")
+      }
+    } catch (error) {
+      notifyerror("Something went wrong")
+    }
   }
   // console.log("dtaquannit",quantity)
   return (
@@ -310,7 +370,7 @@ export default function Adminorder() {
                 <th scope="col">Date</th>
                 
                 {/* <th scope="col">Save</th> */}
-                <th scope="col">Delete</th>
+                <th scope="col">Action</th>
                 </tr>
             </thead>
             <tbody className='text-center'>
@@ -320,7 +380,7 @@ export default function Adminorder() {
                 <td   style={{cursor: "pointer"}} onClick={()=>setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                 <td className='flex text-start'>
                   {itm.product?itm.product[0].title:""}<br/>
-                  <img className='rounded  ' style={{width:"50px"}} src={itm.product[0].images[0] ?imageURL+itm.product[0].images[0].image :null} alt="product" />
+                  <img className='rounded  ' style={{width:"50px"}} src={itm.product?itm.product[0].images[0] ?imageURL+itm.product[0].images[0].image :null:null} alt="product" />
                   </td>
                 <td>{itm.customer_name}</td>
                 <td>{itm.contact}</td>
@@ -350,7 +410,11 @@ export default function Adminorder() {
                   <td >{(itm.created_date).split('T')[0]}</td>
                   
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
-                    <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
+                    <td>
+                      <button onClick={()=>productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" /> Edit</button>
+                      <button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button>
+                      {/* <Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
+                      </td>
                     
                 </tr>
               ))}   
@@ -415,52 +479,7 @@ export default function Adminorder() {
                 <form  onSubmit={(e)=>postorder(e)} >
              
                 <div className="row col-12">
-                  <div className="col-lg-6 col-md-12 col-12">
-                        <div className='container'>                    
-                        <div className="form-group pt-2 ">
-                            <label htmlFor="exampleInputEmail1"><b>product<span className='text-danger'>*</span></b></label>
-                            <select required onChange={(e)=>setproduct(e.target.value) & filterproduct(e.target.value)} value={product} className='form-control w-full'>
-                              <option value='' hidden >Select Product</option>
-                              {productdata ? productdata.map((pitm,pk)=>(
-                                <option key={pk} value={pitm.id}>{pitm.title}</option>
-                              )) :null}
-                            </select>
-                            {/* <input type="text" required className="form-control"   placeholder="Category Name" /> */}
-                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
-                        </div>
-                    </div>
-                    </div>
-                    
-                  <div className="col-lg-6 col-md-12 col-12">
-                        <div className='container'>                    
-                        <div className="form-group pt-2 ">
-                            <label htmlFor="exampleInputEmail1"><b>Quantity<span className='text-danger'>*</span></b></label>
-                            <select required onChange={(e)=>setquantity(e.target.value)}   value={quantity} className='form-control w-full'>
-                              <option value='' hidden >Select quantity</option>
-                              {filteredproduct? filteredproduct.price_list?filteredproduct.price_list.split(',').map((pitm,pk)=>(
-                                <option key={pk} value={pitm}>{pitm} AED</option>
-                              )):Array(10).fill(0).map((itm,k)=>(
-                                <option key={k} value= {`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`}  >{`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`} AED</option>
-                              ))
-                               :null}
-                            </select>
-                            {/* <input type="number" required onChange={(e)=>setquantity(e.target.value)} value={quantity} className="form-control"  placeholder="Enter Quantity" /> */}
-                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
-                        </div>     
-                        </div>
-                        </div>
-                    
-                        <div className="col-6">
-                        <div className='container'>                    
-                        <div className="form-group pt-2 ">
-                            <label htmlFor="exampleInputEmail1"><b>Address</b></label>
-                            <input type="text" required onChange={(e)=>setaddress(e.target.value)} value={address}  className="form-control"    placeholder="Enter Address" />
-                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
-                        </div>     
-                        </div>
-                        </div>
-                 
-                        <div className="col-lg-6 col-md-12 col-12">
+                <div className="col-lg-6 col-md-12 col-12">
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputmobile"><b>Name</b></label>
@@ -473,11 +492,22 @@ export default function Adminorder() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputmobile"><b>Mobile</b></label>
-                            <input type="number" required onChange={(e)=>setmobile(e.target.value)} value={mobile} className="form-control"   placeholder="Enter Mobile" />
+                            <input type="tel" required onChange={(e)=>setmobile(e.target.value)} value={mobile} className="form-control"   placeholder="Enter Mobile +971..." />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
                         </div>
+                        <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>Address</b></label>
+                            <input type="text" required onChange={(e)=>setaddress(e.target.value)} value={address}  className="form-control"    placeholder="Enter Address" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                 
+                       
                      
                         <div className="col-lg-6 col-md-12 col-12">
                         <div className='container'>                    
@@ -493,7 +523,44 @@ export default function Adminorder() {
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
-                        </div></div>
+                        </div>
+                  <div className="col-lg-6 col-md-12 col-12" >
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>product<span className='text-danger'>*</span></b></label>
+                            <select required onChange={(e)=>setproduct(e.target.value) & filterproduct(e.target.value)} value={product} className='form-control w-full'>
+                              <option value='' hidden >Select Product</option>
+                              {productdata ? productdata.map((pitm,pk)=>(
+                                <option key={pk} value={pitm.id}>{pitm.title}</option>
+                              )) :null}
+                            </select>
+                            {/* <input type="text" required className="form-control"   placeholder="Category Name" /> */}
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>
+                    </div>
+                    </div>
+                   
+                    
+                  <div className="col-lg-6 col-md-12 col-12" style={productitm?productitm.id?{display:"none"}:{display:'block'}:{}}>
+                        <div className='container'>                    
+                        <div className="form-group pt-2 ">
+                            <label htmlFor="exampleInputEmail1"><b>Quantity<span className='text-danger'>*</span></b></label>
+                            <select  onChange={(e)=>setquantity(e.target.value)}   value={quantity} className='form-control w-full'>
+                              <option value='' hidden >Select quantity</option>
+                              {filteredproduct? filteredproduct.price_list?filteredproduct.price_list.split(',').map((pitm,pk)=>(
+                                <option key={pk} value={pitm}>{pitm} AED</option>
+                              )):Array(10).fill(0).map((itm,k)=>(
+                                <option key={k} value= {`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`}  >{`${ k+1 + "-" + (filteredproduct.price)*(k+1)}`} AED</option>
+                              ))
+                               :null}
+                            </select>
+                            {/* <input type="number" required onChange={(e)=>setquantity(e.target.value)} value={quantity} className="form-control"  placeholder="Enter Quantity" /> */}
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>
+                      
+                        </div>
                     <div className='p-5 float-end d-flex justify-content-between'> 
                     <div className=''>
                     <button onClick={()=>setmodalvalue(!modalvalue) & setallnull()}  type='button'  className="btn btn-danger ">close</button>
@@ -519,6 +586,10 @@ export default function Adminorder() {
                 </div>
                 {/* {idproduct.map((itm,k)=>( */}
                 <div  className="modal-body  ">
+                  <div className='text-end'>
+                  <button onClick={handlePrint} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="material-symbols:print-outline-rounded" width="20" height="20" /> Print</button>
+                  </div>
+                  <div  ref={componentRef} className="print-section">
                   <div>
                     <b>OrderNo / Date : </b><span> SN{productitm?productitm.created_date.split('T')[1].split('.')[1] +productitm.id:null} / {productitm?productitm.created_date.split('T')[0]:null} </span><b></b><br/>
                     <b>Customer : </b><span> {productitm?productitm.customer_name:null}</span><br/>
@@ -536,7 +607,7 @@ export default function Adminorder() {
                     <th className="border border-slate-600 ...p-2">VAT</th>
                     
                     <th className="border border-slate-600 ...p-2">Total</th>
-                    <th className="border border-slate-600 ...p-2">Action</th>
+                    <th className="border border-slate-600 ...p-2 print-only">Action</th>
                   </tr>
                 </thead>
                   <tbody>
@@ -544,15 +615,15 @@ export default function Adminorder() {
                       <td className="border border-slate-700 ... text-start p-2">{productitm?productitm.product[0].title:null}<br/>
                       <img className='rounded  ' style={{width:"50px"}} src={productitm ? productitm.product[0].images[0] ?imageURL+productitm.product[0].images[0].image :null:null} alt="product" />
                       </td>
-                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, color:e.target.value })} value={productitm?(productitm.color===null?"":productitm.color):""} placeholder="color"></input></td>
-                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, size:e.target.value })} value={productitm?(productitm.size===0?"":productitm.size):""} placeholder="size"></input></td>
-                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, price:e.target.value })} value={productitm?(productitm.price):""}></input></td>
-                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, quantity:e.target.value })} value={productitm?(productitm.quantity):""}></input></td>
-                      <td className="border border-slate-700 ..."><input className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, delivery_charge:e.target.value })} value={productitm?(productitm.delivery_charge):""}></input></td>
-                      <td className="border border-slate-700 ...">{productitm?(productitm.price*0.05).toFixed():null}</td>
+                      <td className="border border-slate-700 ..."><input type="text"  className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, color:e.target.value })} value={productitm?(productitm.color===null?"":productitm.color):""} placeholder="color"></input></td>
+                      <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, size:e.target.value })} value={productitm?(productitm.size===0?"":productitm.size):""} placeholder="size"></input></td>
+                      <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, price:e.target.value })} value={productitm?(productitm.price):""}></input></td>
+                      <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, quantity:e.target.value })} value={productitm?(productitm.quantity):""}></input></td>
+                      <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, delivery_charge:e.target.value })} value={productitm?(productitm.delivery_charge):""}></input></td>
+                      <td className="border border-slate-700 ...">{productitm?productitm.product[0].vat?(productitm.price*0.05).toFixed():0:null}</td>
                       
-                      <td className="border border-slate-700 ...">{productitm?productitm.total:null}</td>
-                      <td className="border border-slate-700 ..."><button className='h-auto w-auto rounded text-white p-1 bg-warning ' ><Icon icon="material-symbols:save-as-outline" width="20" height="20" /> Save</button></td>
+                      <td className="border border-slate-700 ...">{productitm?productitm.price*productitm.quantity:null}</td>
+                      <td className="border border-slate-700 ... print-only"><button onClick={()=>saveproducthandler()} className='h-auto w-auto rounded text-white p-1 bg-warning ' ><Icon icon="material-symbols:save-as-outline" width="20" height="20" /> Save</button></td>
                     </tr>
                     <tr  >
                       <td colSpan={3} className="border border-slate-700 ... p-2">Delivery Note : </td>
@@ -572,12 +643,12 @@ export default function Adminorder() {
                     </tr>
                     <tr  >
                       <td colSpan={3} className="border border-slate-700 ... p-2">Total: </td>
-                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm ? ((productitm.price*productitm.quantity)+productitm.delivery_charge+(productitm.product[0].vat?productitm.price*0.05:0) ).toFixed() :null}</td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm ? parseFloat(parseFloat(productitm.price*productitm.quantity)+parseFloat(productitm.delivery_charge?productitm.delivery_charge:0)+parseFloat(productitm.product[0].vat?productitm.price*parseFloat(0.05):0)).toFixed()  :null}</td>
                     </tr>
                     
                   </tbody>
                 </table>
-
+                </div>
 
                 </div>
                 {/* ))} */}

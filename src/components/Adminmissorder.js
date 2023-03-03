@@ -135,7 +135,11 @@ export default function Adminmissorder() {
                 <td className=''style={{width:"0"}} >{itm.product?itm.product[0].title:""}
                   
                     </td>
-                    <td><Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td>
+                    <td>
+                      {/* <Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /> */}
+                      <button  className='h-auto w-auto rounded text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" />Save to Order</button><br/>
+                      <button  onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button>
+                      </td>
                 </tr>
               ))}  
             </tbody>

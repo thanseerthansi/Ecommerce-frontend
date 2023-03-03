@@ -4084,3 +4084,8 @@ blockquote {
       width: 55px;
       padding-left:3px;
     }
+@media print {
+  .print-only {
+    display: none;
+  }
+}
