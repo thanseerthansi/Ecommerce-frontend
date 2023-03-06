@@ -436,11 +436,15 @@ export default function Adminorder() {
                     <tr>
                     <th scope="col">SN.No</th>
                     <th scope="col">Products</th>
+                    <th scope="col">Size</th>
+                    <th scope="col">Color</th>
                     <th scope="col">Customer</th>
-                    <th scope="col">Contact</th>
-                    
+                    <th scope="col">Contact</th> 
                     <th scope="col">quantity</th>
                     <th scope="col">Price</th>
+                    <th scope="col">Shipping</th>
+                    <th scope="col">Vat</th>
+                    <th scope="col">Total</th>
                     <th scope="col">Address</th>
                     <th scope="col">city</th>
                     <th scope="col">Status</th>
@@ -451,12 +455,16 @@ export default function Adminorder() {
                         <tr key={k}>
                            
                             <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
-                            <td>{itm.product?itm.product.title:""} </td>
+                            <td>{itm.product?itm.product[0].title:""} </td>
+                            <td>{itm.colour}</td>
+                            <td>{itm.size}</td>
                             <td>{itm. customer_name}</td>
                             <td>{itm.contact}</td>
                             
                             <td>{itm.quantity}</td>
-                            <td>{itm.total}</td>
+                            <td>{itm.price}</td>
+                            <td>{itm.delivery_charge}</td>
+                            <td>{itm.product[0].vat?(itm.price*0.05).toFixed():0}</td>
                             <td>{itm.delivery_address}</td>
                             <td>{itm.city}</td>
                             <td >{itm.status[0].status}</td>
