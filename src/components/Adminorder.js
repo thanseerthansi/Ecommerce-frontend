@@ -456,11 +456,10 @@ export default function Adminorder() {
                            
                             <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                             <td>{itm.product?itm.product[0].title:""} </td>
-                            <td>{itm.colour}</td>
                             <td>{itm.size}</td>
+                            <td>{itm.colour}</td>                           
                             <td>{itm. customer_name}</td>
-                            <td>{itm.contact}</td>
-                            
+                            <td>{itm.contact}</td> 
                             <td>{itm.quantity}</td>
                             <td>{itm.price}</td>
                             <td>{itm.delivery_charge}</td>
@@ -627,7 +626,7 @@ export default function Adminorder() {
                       <td className="border border-slate-700 ... text-start p-2">{productitm?productitm.product[0].title:null}<br/>
                       <img className='rounded  ' style={{width:"50px"}} src={productitm ? productitm.product[0].images[0] ?imageURL+productitm.product[0].images[0].image :null:null} alt="product" />
                       </td>
-                      <td className="border border-slate-700 ..."><input type="text"  className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, color:e.target.value })} value={productitm?(productitm.color===null?"":productitm.color):""} placeholder="color"></input></td>
+                      <td className="border border-slate-700 ..."><input type="text"  className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, colour:e.target.value })} value={productitm?(productitm.colour===null?"":productitm.colour):""} placeholder="color"></input></td>
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, size:e.target.value })} value={productitm?(productitm.size===0?"":productitm.size):""} placeholder="size"></input></td>
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, price:e.target.value })} value={productitm?(productitm.price):""}></input></td>
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, quantity:e.target.value })} value={productitm?(productitm.quantity):""}></input></td>
