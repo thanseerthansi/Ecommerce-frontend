@@ -227,7 +227,7 @@ export default function Adminstatus() {
             <div className="modal-dialog modal-dialog-centered modal-xl w-md-50">
                 <div className="modal-content">
                 <div className="modal-header border-0">
-                <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
+                <div className='d-flex pt-1' style={{color:"rgb(245, 189, 7)"}}>
             <p className='fw-bolder ps-4'>Add Status</p> 
             </div>
                     <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcat() &allproductnull}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
@@ -238,7 +238,7 @@ export default function Adminstatus() {
              
                 
                         <div className='container'>                    
-                        <div className="form-group pt-2 ">
+                        <div className="form-group pt-1 ">
                             <label htmlFor="exampleInputEmail1"><b>Category Name<span className='text-danger'>*</span></b></label>
                             <input type="text" required className="form-control" onChange={(e)=>setstatusname(e.target.value)} defaultValue={selectedcat ? selectedcat.status : ''}  placeholder="Category Name" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}

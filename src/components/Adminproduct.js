@@ -692,7 +692,7 @@ export default function Adminproduct() {
                 </div>
                 <div className='ps-3 '>
                 <button type="submit" className="btn btn-info  "><span className='text-white'>Save</span></button>
-                </div>
+                </div><br/>
                 {isloading ? <div className='text-end'>
                   <p>Loading...</p>
                 </div>:null}

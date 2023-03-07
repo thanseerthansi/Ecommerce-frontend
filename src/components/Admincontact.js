@@ -15,7 +15,7 @@ export default function Admincontact() {
   const {accesscheck} =useContext(Simplecontext)
     // console.log("datcata",categoryvalue)
     const [contactdata,setcontactdata]=useState([]); 
-    // const [searchvalue,setsearchvalue]=useState();
+    const [contact,setcontact]=useState();
     const [modalvalue,setmodalvalue]=useState(false);
     const [selectedcontact,setselectedcontact]=useState(null);
     const [address,setaddress]=useState();
@@ -77,6 +77,7 @@ export default function Admincontact() {
           "email":email,
           "instagram":instagram,
           "whatsapp":whatsapp,
+          "contact":contact
           }          
       if(itm){
         datalist.id=itm.id
@@ -104,6 +105,7 @@ export default function Admincontact() {
         }
       } catch (error) {
         console.log(error)
+        notifyerror("Something went wrong")
       }
     }
     const allproductnull=()=>{
@@ -178,6 +180,7 @@ export default function Admincontact() {
                 <tr>
                 <th scope="col">#</th>
                 <th scope="col">Address</th>
+                <th scope="col">Contact</th>
                 <th scope="col">Facebook</th>
                 <th scope="col">Email</th>
                 <th scope="col">Instagram</th>
@@ -188,10 +191,11 @@ export default function Admincontact() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {contactdata.map((itm,k)=>(
+              {contactdata.length? contactdata.map((itm,k)=>(
                 <tr key={k} >
                 <th scope="row">{k+1}</th>
-                <td>{itm.address}</td>
+                <td className='text-start'>{itm.address}</td>
+                <td>{itm.contact}</td>
                 <td>{itm.facebook}</td>
                 <td>{itm.email}</td>
                 <td>{itm.instagram}</td>
@@ -203,7 +207,7 @@ export default function Admincontact() {
                 
                 {/* <td><Icon  className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
                 </tr>
-              ))}   
+              )):<tr><td colSpan={9}><p>No Data Found</p></td></tr>}   
             </tbody>
             </table>
           </div>
@@ -212,8 +216,8 @@ export default function Admincontact() {
             <div className="modal-dialog modal-dialog-centered modal-xl w-md-50">
                 <div className="modal-content">
                 <div className="modal-header border-0">
-                <div className='d-flex pt-3' style={{color:"rgb(245, 189, 7)"}}>
-            <p className='fw-bolder ps-4'>Add Categories</p> 
+                <div className='d-flex pt-0' style={{color:"rgb(245, 189, 7)"}}>
+            <p className='fw-bolder ps-4'>Contact</p> 
             </div>
                     <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() &allproductnull()}  type="button" className="btn-close" data-bs-dismiss="modal"  aria-label="Close" />
                 </div>
@@ -224,29 +228,37 @@ export default function Admincontact() {
                 <div className="row col-12">
                   <div className="col-lg-6 col-md-12 col-12">
                         <div className='container'>                    
-                        <div className="form-group pt-2 ">
+                        <div className="form-group pt-0 ">
                             <label htmlFor="exampleInputEmail1"><b>Address<span className='text-danger'>*</span></b></label>
-                            <input type="text" required className="form-control" onChange={(e)=>setaddress(e.target.value)} defaultValue={selectedcontact ? selectedcontact.address : null}  placeholder="Category Name" />
+                            <input type="text" required className="form-control" onChange={(e)=>setaddress(e.target.value)} defaultValue={selectedcontact ? selectedcontact.address : null}  placeholder="Address" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>
                     </div>
                     </div>
-                    
+                    <div className="col-lg-6 col-md-12 col-12">
+                        <div className='container'>                    
+                        <div className="form-group pt-0 ">
+                            <label htmlFor="exampleInputEmail1"><b>Contact</b></label>
+                            <input type="tel" required className="form-control"  onChange={(e)=>setcontact(e.target.value)} defaultValue={selectedcontact ? selectedcontact.contact : null}  placeholder="Contact" />
+                            {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
+                        </div>     
+                        </div>
+                        </div>  
                   <div className="col-lg-6 col-md-12 col-12">
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Facebook</b></label>
-                            <input type="text"  className="form-control"  onChange={(e)=>setfacebook(e.target.value)} defaultValue={selectedcontact ? selectedcontact.facebook : null}  placeholder="Description" />
+                            <input type="text"  className="form-control"  onChange={(e)=>setfacebook(e.target.value)} defaultValue={selectedcontact ? selectedcontact.facebook : null}  placeholder="Facebook" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
                         </div>
                     
-                        <div className="col-6">
+                        <div className="col-lg-6 col-md-12 col-12">
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Email</b></label>
-                            <input type="text" required  className="form-control"  onChange={(e)=>setemail(e.target.value)} defaultValue={selectedcontact ? selectedcontact.email : null}  placeholder="Description" />
+                            <input type="text" required  className="form-control"  onChange={(e)=>setemail(e.target.value)} defaultValue={selectedcontact ? selectedcontact.email : null}  placeholder="email" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
@@ -256,7 +268,7 @@ export default function Admincontact() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Instagram</b></label>
-                            <input type="text"  className="form-control"  onChange={(e)=>setinstagram(e.target.value)} defaultValue={selectedcontact ? selectedcontact.instagram : null}  placeholder="Description" />
+                            <input type="text"  className="form-control"  onChange={(e)=>setinstagram(e.target.value)} defaultValue={selectedcontact ? selectedcontact.instagram : null}  placeholder="instagram" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
@@ -266,11 +278,12 @@ export default function Admincontact() {
                         <div className='container'>                    
                         <div className="form-group pt-2 ">
                             <label htmlFor="exampleInputEmail1"><b>Whatsapp</b></label>
-                            <input type="text" required className="form-control"  onChange={(e)=>setwhatsapp(e.target.value)} defaultValue={selectedcontact ? selectedcontact.whatsapp : null}  placeholder="Description" />
+                            <input type="tel" required className="form-control"  onChange={(e)=>setwhatsapp(e.target.value)} defaultValue={selectedcontact ? selectedcontact.whatsapp : null}  placeholder="whatsapp Number" />
                             {/* <small id="emailHelp" className="form-text text-muted">We'll never share your email with anyone else.</small> */}
                         </div>     
                         </div>
-                        </div></div>
+                        </div>
+                        </div>
                     <div className='p-5 float-end d-flex justify-content-between'> 
                     <div className=''>
                     <button onClick={()=>setmodalvalue(!modalvalue) & setselectedcontact() & allproductnull()}  type='button'  className="btn btn-danger ">close</button>

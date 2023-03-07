@@ -463,7 +463,7 @@ export default function Adminorder() {
                             <td>{itm.quantity}</td>
                             <td>{itm.price}</td>
                             <td>{itm.delivery_charge}</td>
-                            <td>{itm.product[0].vat?(itm.price*0.05).toFixed():0}</td>
+                            <td>{itm.product?itm.product[0].vat?(itm.price*0.05).toFixed(2):0:0}</td>
                             <td>{itm.delivery_address}</td>
                             <td>{itm.city}</td>
                             <td >{itm.status[0].status}</td>
@@ -631,7 +631,7 @@ export default function Adminorder() {
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, price:e.target.value })} value={productitm?(productitm.price):""}></input></td>
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, quantity:e.target.value })} value={productitm?(productitm.quantity):""}></input></td>
                       <td className="border border-slate-700 ..."><input type="number" className='inputclass_order' onChange={(e)=>setproductitm({ ...productitm, delivery_charge:e.target.value })} value={productitm?(productitm.delivery_charge):""}></input></td>
-                      <td className="border border-slate-700 ...">{productitm?productitm.product[0].vat?(productitm.price*0.05).toFixed():0:null}</td>
+                      <td className="border border-slate-700 ...">{productitm?productitm.product[0].vat?(productitm.price*0.05).toFixed(2):0:null}</td>
                       
                       <td className="border border-slate-700 ...">{productitm?productitm.price*productitm.quantity:null}</td>
                       <td className="border border-slate-700 ... print-only"><button onClick={()=>saveproducthandler()} className='h-auto w-auto rounded text-white p-1 bg-warning ' ><Icon icon="material-symbols:save-as-outline" width="20" height="20" /> Save</button></td>
@@ -650,7 +650,7 @@ export default function Adminorder() {
                     </tr>
                     <tr  >
                       <td colSpan={3} className="border border-slate-700 ... p-2">VAT: </td>
-                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm?productitm.product[0].vat?productitm.price*0.05:0:null}</td>
+                      <td colSpan={6} className="border border-slate-700 ... p-2">{productitm?productitm.product[0].vat?(productitm.price*0.05).toFixed(2):0:null}</td>
                     </tr>
                     <tr  >
                       <td colSpan={3} className="border border-slate-700 ... p-2">Total: </td>

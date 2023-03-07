@@ -214,7 +214,7 @@ export default function Adminmissorder() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {orderdata.map((itm,k)=>(
+              {orderdata.length? orderdata.map((itm,k)=>(
                 <tr key={k}>
                 <th scope="row">{k+1}</th>
                 <td>{itm.customer_name}</td>
@@ -230,7 +230,7 @@ export default function Adminmissorder() {
                       <button  onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button>
                       </td>
                 </tr>
-              ))}  
+              )):<tr><td colSpan={7}><p>No Data Found</p></td></tr>}  
             </tbody>
             </table>
           </div>

@@ -169,7 +169,7 @@ export default function Admincategory() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {filteredcategory.map((itm,k)=>(
+              {filteredcategory.length?filteredcategory.map((itm,k)=>(
                 <tr key={k} >
                 <th scope="row">{k+1}</th>
                 <td>{itm.category_type}</td>
@@ -181,7 +181,7 @@ export default function Admincategory() {
                 
                 {/* <td><Icon  className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
                 </tr>
-              ))}   
+              )):<tr><td colSpan={5}><p>No Data Found</p></td></tr>}   
             </tbody>
             </table>
           </div>
