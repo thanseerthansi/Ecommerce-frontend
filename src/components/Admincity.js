@@ -25,6 +25,7 @@ export default function Admincity() {
     // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",categoryname)
     useEffect(() => {
+      window.scrollTo(0, 0);
         Getcity()
         accesscheck()
     }, [])

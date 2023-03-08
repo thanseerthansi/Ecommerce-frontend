@@ -26,7 +26,7 @@ export default function Adminstatus() {
     // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",statusname)
     useEffect(() => {
-        
+      window.scrollTo(0, 0);
         accesscheck()
         Getstatus()
     }, [])

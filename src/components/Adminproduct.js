@@ -51,6 +51,7 @@ export default function Adminproduct() {
     }else{setfilteredprduct(productlist)}
 }
   useEffect(() => {  
+    window.scrollTo(0, 0);
     products()
     accesscheck()
   }, [])

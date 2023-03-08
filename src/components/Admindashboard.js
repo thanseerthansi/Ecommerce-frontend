@@ -14,8 +14,9 @@ export default function Admindashboard() {
   const[todaysorder,settodaysorder]=useState([]);
   // var token = window.localStorage.getItem('access_token')
   useEffect(() => {
-   orders()
-   accesscheck()
+    window.scrollTo(0, 0);
+    orders()
+    accesscheck()
 
   }, [])
   const notifyerror = (msg) => toast.error(msg, {

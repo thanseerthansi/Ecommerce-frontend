@@ -22,6 +22,7 @@ export default function Admincategory() {
     // var token = window.localStorage.getItem('access_token')
     // console.log("dsecrip",categoryname)
     useEffect(() => {
+        window.scrollTo(0, 0);
         setfilteredcategory(categoryvalue)
         accesscheck()
     }, [])

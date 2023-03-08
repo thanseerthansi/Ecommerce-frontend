@@ -15,6 +15,7 @@ export default function Adminprofile() {
   
   // console.log("id",userid)
   useEffect(() => {
+    window.scrollTo(0, 0);
     userdata()
     accesscheck()
   },[]);
@@ -24,7 +25,7 @@ export default function Adminprofile() {
   let userid = decoded.user_id
   // let headers = "Bearer "+token 
   // console.log("headre",headers)
-  const userdata=()=>{axios.get(`]${BaseURL}user/user/`,{ headers: {"Authorization" : `Bearer ${token}`},params:{id:userid}}).then(response=>{
+  const userdata=()=>{axios.get(`${BaseURL}user/user/`,{ headers: {"Authorization" : `Bearer ${token}`},params:{id:userid}}).then(response=>{
    
     // console.log("data",response.data)
     setprofile(response.data);

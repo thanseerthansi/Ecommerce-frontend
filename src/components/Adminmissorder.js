@@ -26,7 +26,7 @@ export default function Adminmissorder() {
   // var token = window.localStorage.getItem('access_token')
 
   useEffect(() => {
-   
+    window.scrollTo(0, 0);
     missorders()
     accesscheck()
   }, [])

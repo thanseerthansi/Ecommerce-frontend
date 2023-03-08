@@ -65,6 +65,7 @@ export default function Adminorder() {
       });
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     status()
     orders()
     accesscheck()
