@@ -78,10 +78,10 @@ export default function Adminslider() {
             <Link  to="/status" className="link-light" data-key="t-analytics">
             <Icon icon="gridicons:stats-up-alt" width="38" height="23" /><span>Status</span>
                  </Link></li>
-            <li role='button'  className=' d-flex text-white mt-3' >
+            {/* <li role='button'  className=' d-flex text-white mt-3' >
             <Link  to="/metatags" className="link-light" data-key="t-analytics">
             <Icon icon="material-symbols:code-blocks" width="38" height="25" /><span>MetaTag</span>
-                 </Link></li>
+                 </Link></li> */}
         </ul>
         </div>
         </>
