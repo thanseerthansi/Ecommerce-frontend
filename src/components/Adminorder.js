@@ -304,9 +304,11 @@ export default function Adminorder() {
           <div className='d-flex pt-2' style={{color:"rgb(245, 189, 7)"}}>
           <Icon icon="icon-park-twotone:order" width="40" height="23" /> <p className='fw-bolder'> Orders</p>
           </div>
-         
+
           {/* filterstart */}
+          
           <div className="filter-sort- d-flex   flex-wrap justify-content-center">
+            
             <div className="filter-sorting justify-content-end">
               <div className="collection-sorting position-relative ">
                 <div className="sorting-header  d-flex align-items-center justify-content-end">
@@ -318,6 +320,7 @@ export default function Adminorder() {
                     </svg>
                   </span>
                 </div>
+                
                 <ul className="sorting-lists list-unstyled md-10 w-auto text-center">
                   <li  className="text_14" style={{backgroundColor:"white",padding:"4px",borderRadius:"3px"}} onClick={()=>setfilter([])}> All </li>
                   {filterstatus.map((itm,k)=>(
@@ -352,8 +355,21 @@ export default function Adminorder() {
               </DownloadTableExcel>
               {/* excel export button end */}
                 </div>
-                <div className=''>
+                <div className='row col-12'>
+                <div className='ml-4  col-6'  >
+                <select defaultValue={''} style={{marginLeft:"20px"}} >
+                        {filterstatus ? <>
+                          <option value={''} hidden>change status</option>
+
+                            {filterstatus.map((item,k)=>(
+                            <option  key={k} value={item.status} style={{backgroundColor:item.color,padding:"4px",borderRadius:"3px"}} >{item.status}</option>
+                          ))}
+                        </>:null}
+                        </select>
+                </div>
+                <div className=' col-6'>
                   <button onClick={()=>setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='btn-sm btn-info text-white float-end'>Add New</button>
+                </div>
                 </div>
           </div>
           
@@ -361,7 +377,9 @@ export default function Adminorder() {
           <table className="table table-bordered   overflow-auto">
             <thead className='text-center '>
                 <tr>
-                <th scope="col">#</th>
+                <th scope="col">
+                <input type="checkbox" id=""  value=""/>
+                  #</th>
                 <th scope="col ">SN.No</th>
                 <th scope="col">Product</th>
                 <th scope="col">Customer</th>
@@ -381,7 +399,7 @@ export default function Adminorder() {
             <tbody className='text-center'>
               {(filter.length===0 ? ordersearchdata :ordersearchdata.filter(t=>parseInt(t.status[0].id) === parseInt(filter.id))) .map((itm,k)=>(
                 <tr key={k} className="">
-                <th scope="row">{k+1}</th>
+                <th scope="row"><input type="checkbox" id=""  value={itm.id}/><br/>{k+1}</th>
                 <td   style={{cursor: "pointer"}} onClick={()=>setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
                 <td className='flex text-start'>
                   {itm.product?itm.product[0].title:""}<br/>
@@ -415,9 +433,11 @@ export default function Adminorder() {
                   <td >{(itm.created_date).split('T')[0]}</td>
                   
                     {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
-                    <td>
-                      <button onClick={()=>productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" /> Edit</button><br/>
-                      <button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button>
+                    <td className=''>
+                      <div className='d-flex'>
+                      <button onClick={()=>productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded d-flex text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" />Edit </button><br/>
+                      </div>
+                      {/* <button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button> */}
                       {/* <Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
                       </td>
                     
@@ -435,40 +455,41 @@ export default function Adminorder() {
   <table  ref={tableRef} hidden>
                   <tbody>
                     <tr>
-                    <th scope="col">SN.No</th>
-                    <th scope="col">Products</th>
+                    <th scope="col">Order_id </th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Address</th>
+                    <th scope="col">Contact_Number</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Product_Code</th> 
+                    <th scope="col">Product_Name</th>
+                    <th scope="col">Delivery_Charge</th>
+                    <th scope="col">Product_Price</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Product_Sub_Price</th>
+                    <th scope="col">Product_VAT</th>
+                    <th scope="col">Product_Total_Price</th>
                     <th scope="col">Size</th>
                     <th scope="col">Color</th>
-                    <th scope="col">Customer</th>
-                    <th scope="col">Contact</th> 
-                    <th scope="col">quantity</th>
-                    <th scope="col">Price</th>
-                    <th scope="col">Shipping</th>
-                    <th scope="col">Vat</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">Address</th>
-                    <th scope="col">city</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Date</th>
                     
                     </tr>
                     {(filter.length===0 ? ordersearchdata :ordersearchdata.filter(t=>parseInt(t.status[0].id) === parseInt(filter.id))) .map((itm,k)=>(
                         <tr key={k}>
                            
                             <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+                            <td>{itm. customer_name}</td>         
+                            <td>{itm.delivery_address}</td>
+                            <td>{itm.contact}</td>
+                            <td>{itm.city}</td>
+                            <td>{itm.product?itm.product[0].code:""} </td>
                             <td>{itm.product?itm.product[0].title:""} </td>
-                            <td>{itm.size}</td>
-                            <td>{itm.color}</td>                           
-                            <td>{itm. customer_name}</td>
-                            <td>{itm.contact}</td> 
+                            <td>{itm.delivery_charge}</td>
+                            <td>{itm.price}</td>
                             <td>{itm.quantity}</td>
                             <td>{itm.price}</td>
-                            <td>{itm.delivery_charge}</td>
                             <td>{itm.product?itm.product[0].vat?(itm.price*0.05).toFixed(2):0:0}</td>
-                            <td>{itm.delivery_address}</td>
-                            <td>{itm.city}</td>
-                            <td >{itm.status[0].status}</td>
-                            <td>{itm.created_date.split('T')[0]}</td>
+                            <td>{ parseFloat(parseFloat(itm.price*itm.quantity)+parseFloat(itm.delivery_charge?itm.delivery_charge:0)+parseFloat(itm.product[0].vat?itm.price*parseFloat(0.05):0)).toFixed() }</td>
+                            <td>{itm.size===0?"":itm.size}</td>
+                            <td>{itm.color}</td>                           
                             
                         </tr>
                     ))}
