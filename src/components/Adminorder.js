@@ -14,7 +14,7 @@ import Callaxios from './Callaxios';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import { BaseURL, imageURL } from './Url';
-
+import DataTable from 'react-data-table-component';
 export default function Adminorder() {
   const { accesscheck } = useContext(Simplecontext)
   const [filterstatus, setfilterstatus] = useState([]);
@@ -364,6 +364,96 @@ export default function Adminorder() {
     } catch (error) {
     }
   }
+  const columns =[
+    
+    {
+      name: <div><input type="checkbox" id="" checked={mutivalue.length===mutipleselectvalue.length} value="all" onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br/>#</div>,
+      selector: (itm,index) => <div><input type="checkbox" id="" checked={mutivalue.includes(itm.id) ? mutivalue.includes(itm.id) : false} value={itm.id} onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br />{index+1}</div>,
+      width:"50px",
+    },
+    {
+      name:"SN.NO",
+      selector : (itm)=><div style={{ cursor: "pointer" }} onClick={() => setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</div>,
+      width:"auto",
+    },
+    {
+      name:"PRODUCT",
+      selector : (itm)=><div className='flex text-start'>
+      {itm.product ? itm.product[0].title : ""}<br />
+      <img className='rounded  ' style={{ width: "50px" }} src={itm.product ? itm.product[0].images[0] ? imageURL + itm.product[0].images[0].image : null : null} alt="product" />
+    </div>,
+    // width:"auto"
+    },
+    {
+      name:"CUSTOMER",
+      selector : (itm)=>itm.customer_name,
+    },
+    {
+      name:"CONTACT",
+      selector : (itm)=>itm.contact,
+      width:"auto"
+    },
+    {
+      name:"CITY",
+      selector : (itm)=>itm.city,
+    },
+    {
+      name:"STATUS",
+      selector : (itm)=> <div className='pt-3  mb-2 '>
+      <div className=''>
+        <span className='font-bold p-2' style={{ backgroundColor: itm.status[0].color, borderRadius: "4px", color: "white", fontWeight: "500" }}>{itm.status[0].status}</span>
+      </div><br />
+      <div>
+        <select defaultValue={''} onChange={(e) => changestatus(itm.id, e.target.value)} >
+          {filterstatus ? <>
+            <option value={''} hidden>change status</option>
+
+            {filterstatus.map((item, k) => (
+              <option key={k} value={item.status} style={{ backgroundColor: item.color, padding: "4px", borderRadius: "3px" }} >{item.status}</option>
+            ))}
+          </> : null}
+        </select>
+      </div>
+
+    </div>,
+    width:"150px",
+    },
+    {
+      name:"DATE",
+      selector : (itm)=>(itm.created_date).split('T')[0],
+    },
+    {
+      name:"ACTION",
+      selector : (itm)=> <div className='d-flex'>
+      <button onClick={() => productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded d-flex text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" />Edit </button><br />
+    </div>,
+    width:"100px"
+    },
+    
+  ]
+  const customStyles = {
+    cells: {
+      style: {
+        border: "0.5px solid #f5f2f2 ",
+        
+      },
+    },
+    
+    headCells: {
+      style: {
+        minHeight: '40px',
+        border:"0.5px solid #e8e2e2 ",
+        borderTopWidth: '1.5px'
+      },
+    
+    },
+    filter:{
+      style:{
+        border:"1px solid gray",
+      }
+    }
+ 
+  };
   return (
     <div >
       <Adminslider />
@@ -450,7 +540,20 @@ export default function Adminorder() {
                 </div>
 
                 <div className='container pt-md-2 pt-2'>
-                  <table className="table table-bordered   overflow-auto">
+                <DataTable
+                  pagination
+                  highlightOnHover
+                  columns={columns}
+                  data={(filter.length === 0 ? ordersearchdata : ordersearchdata.filter(t => parseInt(t.status[0].id) === parseInt(filter.id)))}               
+                  defaultSortField="_id"
+                  defaultSortAsc={false}               
+                  paginationRowsPerPageOptions={[10,20,50,100]}
+                  // fixedHeader
+                  // fixedHeaderScrollHeight='63vh'
+                  // className="tablereact  tablereact "
+                  customStyles={customStyles}
+                />
+                  {/* <table className="table table-bordered   overflow-auto">
                     <thead className='text-center '>
                       <tr>
                         <th scope="col">
@@ -460,15 +563,9 @@ export default function Adminorder() {
                         <th scope="col">Product</th>
                         <th scope="col">Customer</th>
                         <th scope="col">Contact</th>
-                        {/* <th scope="col">quantity</th> */}
-
-                        {/* <th scope="col">Price</th> */}
-                        {/* <th scope="col">Address</th> */}
                         <th scope="col">city</th>
                         <th scope="col">Status</th>
                         <th scope="col">Date</th>
-
-                        {/* <th scope="col">Save</th> */}
                         <th scope="col">Action</th>
                       </tr>
                     </thead>
@@ -483,10 +580,6 @@ export default function Adminorder() {
                           </td>
                           <td>{itm.customer_name}</td>
                           <td>{itm.contact}</td>
-                          {/* <td>{itm.quantity}</td> */}
-
-                          {/* <td>{itm.total}</td> */}
-                          {/* <td>{itm.delivery_address}</td> */}
                           <td>{itm.city}</td>
                           <td className='pt-3 '>
                             <div>
@@ -508,19 +601,16 @@ export default function Adminorder() {
 
                           <td >{(itm.created_date).split('T')[0]}</td>
 
-                          {/* <td> <Icon className='btn p-0' icon="fluent:save-16-regular" width="30" height="30" /></td> */}
                           <td className=''>
                             <div className='d-flex'>
                               <button onClick={() => productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded d-flex text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" />Edit </button><br />
                             </div>
-                            {/* <button onClick={()=>submitdeletecategory(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" /> Delete</button> */}
-                            {/* <Icon onClick={()=>submitdeletecategory(itm.id)} className='btn p-0' icon="fluent:delete-24-regular" width="30" height="25 " /></td> */}
-                          </td>
+                            </td>
 
                         </tr>
                       ))}
                     </tbody>
-                  </table>
+                  </table> */}
                 </div>
               </div>
             </div>
