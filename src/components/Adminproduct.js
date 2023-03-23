@@ -338,7 +338,7 @@ export default function Adminproduct() {
       <div className='col-md-10 col-11'>
       
       <div className='pt-0 ps-md-0' >
-          <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>       
+          <div className='  bg-white  shadow-lg overflow-auto' style={{width:"100%",borderRadius:".80rem"}}>       
           {/* <div className='float-right'><button className='btn btn-primary float-end'>Add new</button></div> */}         
           
           <div className='container pt-md-0 pt-0'>

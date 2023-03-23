@@ -467,7 +467,7 @@ export default function Adminorder() {
           </div>
           <div className='col-md-10 col-11'>
             <div className='pt-0 ps-md-0' >
-              <div className=' vh-100 bg-white  shadow-lg overflow-auto' style={{ width: "100%", borderRadius: ".80rem" }}>
+              <div className='  bg-white  shadow-lg overflow-auto' style={{ width: "100%", borderRadius: ".80rem" }}>
                 <div className='d-flex pt-2' style={{ color: "rgb(245, 189, 7)" }}>
                   <Icon icon="icon-park-twotone:order" width="40" height="23" /> <p className='fw-bolder'> Orders</p>
                 </div>
