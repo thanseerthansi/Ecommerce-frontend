@@ -34,7 +34,8 @@ export default function Admindashboard() {
         const today = new Date(timeElapsed);
         let newdate = today.toISOString();
         // console.log("ldate",newdate.split('T')[0])
-        let fvalue = data.data.filter(t=>t.updated_date.split('T')[0].includes(newdate.split('T')[0]))
+        
+        let fvalue = data.data.filter(t=>t.created_date.split('T')[0]===(newdate.split('T')[0]))
             settodaysorder(fvalue)
             // console.log("favlue",fvalue)
       }else{
