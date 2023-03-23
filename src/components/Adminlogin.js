@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import {useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Callaxios from './Callaxios';
+// import Callaxios from './Callaxios';
 import { BaseURL } from './Url';
 
 export default function Adminlogin () {

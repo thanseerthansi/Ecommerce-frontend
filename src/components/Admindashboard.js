@@ -3,7 +3,7 @@ import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider'
 import { Icon } from '@iconify/react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
 import { Simplecontext } from './Simplecontext';
 import Callaxios from './Callaxios';
 import { ToastContainer, toast } from 'react-toastify';
@@ -52,6 +52,7 @@ export default function Admindashboard() {
         
       <div className=" vh-100 overflow-auto"  style={{backgroundColor:"#c3d5d5"}}>
       <Adminlogout/>
+      <ToastContainer/>
       <div className="col-12 row " >
           <div className='col-2'>
           </div>

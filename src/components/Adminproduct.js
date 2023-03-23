@@ -1,4 +1,4 @@
-import axios from 'axios'
+// import axios from 'axios'
 import React, { useContext, useEffect, useState } from 'react'
 import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider'
@@ -10,6 +10,8 @@ import { Simplecontext } from './Simplecontext';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import Callaxios from './Callaxios';
+import DataTable from 'react-data-table-component';
+
 export default function Adminproduct() {
   
 //   const [orderdata,setorderdata]=useState([]);
@@ -59,9 +61,9 @@ export default function Adminproduct() {
   const notify = () => toast.success('✅ Deleted Successfully!', {
     position: "top-center",
     });
-  const notifyproductupdated = () => toast.success('✅ Product Updated Successfully!', {
-    position: "top-center",
-    });
+  // const notifyproductupdated = () => toast.success('✅ Product Updated Successfully!', {
+  //   position: "top-center",
+  //   });
   const notifyproductadded = () => toast.success('✅ Product added Successfully!', {
     position: "top-center",
     });
@@ -245,7 +247,83 @@ export default function Adminproduct() {
       setisloading(false)
     }
   }
-  
+  const rowNumber = (row) => (filter?filteredprduct.filter(t=>t.category[0].category_type.toUpperCase().includes(filter.category_type.toUpperCase())):filteredprduct).indexOf(row) + 1;
+  const columns =[
+    
+    {
+      name: <div>#</div>,
+      selector: (itm,index) =>rowNumber(itm) ,
+      width:"50px",
+    },
+    {
+      name:"Product Title",
+      selector : (itm)=><div className='d-flex-col text-start ' style={{whiteSpace:'break-spaces'}} >{itm.title}<br/>
+      <img className='rounded w-25'  src={itm.images[0] ? itm.images[0].image :null} alt={itm.title} />
+      </div>,
+      width:"20%",
+    },
+    {
+      name:"Images",
+      selector : (itm)=><div className='d-flex-col text-center'>
+      {(itm.images).map((img,k)=>(
+      <div key={k}>
+           <img  className='rounded w-25'  src={img.image} alt={itm.title} /><br/>
+      </div>
+      ))}                       
+  </div>,
+    width:"20%",
+    },
+    {
+      name:"Product Details",
+      selector : (itm)=><div><b>Description :</b>{itm.description}<br/>
+      <b>Brand:</b>{itm.brand}<br/>
+      <b>Code:</b>{itm.code}<br/></div>,
+    },
+    {
+      name:"Created Date",
+      selector : (itm)=>itm.created_date.split('T')[0],
+      width:"auto"
+    },
+    {
+      name:"status",
+      selector : (itm)=>itm.status===true ? 
+      <button onClick={()=>setstatus(false,itm.id)} className='h-auto w-auto rounded text-white p-1 bg-success' >enabled</button>
+       :<button onClick={()=>setstatus(true,itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger'  >disabled</button>,
+       width:"10%",
+    },
+    {
+      name:"Action",
+      selector : (itm)=><div className='my-2'><button onClick={()=>setmodaledit(!modaledit)& seteditproduct(itm)} className='h-auto w-auto rounded text-white p-1 bg-warning ' style={{width:"50%"}}><Icon icon="clarity:note-edit-line" width="20" height="20" />edit</button><br/>
+      <div className='pt-1 text-sm'><button onClick={()=>changevat(itm.vat? false:true,itm.id)} style={itm.vat?{backgroundColor:"#198754"}:{backgroundColor:"#d32525"}} className='h-auto w-auto rounded text-white p-1  ' ><Icon icon="ic:twotone-remove-red-eye"  width="20" height="20" />VAT</button></div>
+      <div className='pt-1 '><button onClick={()=>submitdeleteproduct(itm.id)} className='h-auto w-auto rounded text-white p-1 bg-danger  ' ><Icon icon="fluent:delete-24-regular" width="20" height="20" />delete</button></div></div> ,
+    width:"10%",
+    },
+    
+  ]
+ 
+  const customStyles = {
+    cells: {
+      style: {
+        border: "0.5px solid #f5f2f2 ",
+        
+      },
+    },
+    
+    headCells: {
+      style: {
+        minHeight: '40px',
+        border:"0.5px solid #e8e2e2 ",
+        borderTopWidth: '1.5px'
+      },
+    
+    },
+    filter:{
+      style:{
+        border:"1px solid gray",
+      }
+    }
+ 
+  };
   return (
     <div >
     <Adminslider/>
@@ -303,7 +381,20 @@ export default function Adminproduct() {
               <button onClick={()=>setmodalvalue(!modalvalue)} className='btn-sm btn-info text-white float-end'>Add New</button>
             </div>
           </div>
-          <table className="table table-bordered">
+          <DataTable
+                  pagination
+                  highlightOnHover
+                  columns={columns}
+                  data={(filter?filteredprduct.filter(t=>t.category[0].category_type.toUpperCase().includes(filter.category_type.toUpperCase())):filteredprduct)}               
+                  defaultSortField="_id"
+                  defaultSortAsc={false}               
+                  paginationRowsPerPageOptions={[10,20,50,100]}
+                  // fixedHeader
+                  // fixedHeaderScrollHeight='63vh'
+                  // className="tablereact  tablereact "
+                  customStyles={customStyles}
+                />
+          {/* <table className="table table-bordered">
             <thead className='text-center'>
                 <tr>
                 <th scope="col">#</th>
@@ -316,7 +407,7 @@ export default function Adminproduct() {
                 </tr>
             </thead>
             <tbody className='text-center'>
-              {(filter? filteredprduct .filter(t=>t.category[0].category_type.toUpperCase().includes(filter.category_type.toUpperCase())): filteredprduct).map((itm,k)=>(
+              {(filter? filteredprduct.filter(t=>t.category[0].category_type.toUpperCase().includes(filter.category_type.toUpperCase())): filteredprduct).map((itm,k)=>(
                 <tr key={k}>
                 <th scope="row">{k+1}</th>
                 <td>
@@ -349,7 +440,7 @@ export default function Adminproduct() {
                 </tr>
               ))}   
             </tbody>
-            </table>
+            </table> */}
               {/* modal */}
               {modalvalue?
         <div className="modal fade show" tabIndex={-1} id="quickview-modal" aria-modal="true" role="dialog" style={{display: 'block', paddingLeft: "20%",paddingRight:"2%"}}>

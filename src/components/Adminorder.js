@@ -1,9 +1,9 @@
-import axios from 'axios'
+// import axios from 'axios'
 import React, { useContext, useEffect, useRef, useState } from 'react'
 import Adminlogout from './Adminlogout'
 import Adminslider from './Adminslider';
 import { Icon } from '@iconify/react';
-import Dropdown from 'react-bootstrap/Dropdown';
+// import Dropdown from 'react-bootstrap/Dropdown';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // import Test from './Adminexportexcel';
@@ -11,9 +11,9 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { Simplecontext } from './Simplecontext';
 import Callaxios from './Callaxios';
-import { confirmAlert } from "react-confirm-alert";
+// import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { BaseURL, imageURL } from './Url';
+import {imageURL } from './Url';
 import DataTable from 'react-data-table-component';
 export default function Adminorder() {
   const { accesscheck } = useContext(Simplecontext)
@@ -36,7 +36,7 @@ export default function Adminorder() {
   const [detailmodal, setdetailmodal] = useState(false);
   const [productitm, setproductitm] = useState()
   const [mutivalue, setmutivalues] = useState([])
-  const arr = new Array(10).fill(0)
+  // const arr = new Array(10).fill(0)
   const componentRef = useRef();
   const handlePrint = () => {
     const originalContents = document.body.innerHTML;
@@ -53,9 +53,9 @@ export default function Adminorder() {
 
   };
   // console.log("multivalue",mutivalue)
-  const notify = () => toast.success('✅ Deleted Successfully!', {
-    position: "top-center",
-  });
+  // const notify = () => toast.success('✅ Deleted Successfully!', {
+  //   position: "top-center",
+  // });
   const notifyadd = (msg) => toast.success(msg, {
     position: "top-center",
   });
@@ -129,9 +129,9 @@ export default function Adminorder() {
 
         let datap = productdata.filter(t => t.id === parseInt(product))
         let price = quantity.split('-')[1]
-        let vat = datap[0]?.vat.toString() ?? ""
+        // let vat = datap[0]?.vat.toString() ?? ""
         let deliverycharge = datap[0]?.delivery_charge ?? ""
-        let vatprice = vat ? parseInt(price * 0.05) : 0
+        // let vatprice = vat ? parseInt(price * 0.05) : 0
 
         datalist = {
           product: product,
@@ -173,16 +173,16 @@ export default function Adminorder() {
     }
   }
 
-  const deleteproduct = async (id) => {
-    // console.log("k",k)
-    // console.log("id",id)
-    accesscheck()
-    let data = await Callaxios("delete", "product/order/", { "id": id })
-    if (data.data.Status === 200) {
-      notify()
-      orders()
-    }
-  }
+  // const deleteproduct = async (id) => {
+  //   // console.log("k",k)
+  //   // console.log("id",id)
+  //   accesscheck()
+  //   let data = await Callaxios("delete", "product/order/", { "id": id })
+  //   if (data.data.Status === 200) {
+  //     notify()
+  //     orders()
+  //   }
+  // }
   const Getcity = async () => {
     try {
       let data = await Callaxios("get", "product/city/")
@@ -229,23 +229,23 @@ export default function Adminorder() {
     }
     else { setordersearchdata(orderdata) }
   }
-  const submitdeletecategory = (itemid) => {
-    confirmAlert({
-      title: "Confirmation",
-      message: `Are you sure to delete this ?`,
-      buttons: [
-        {
-          label: "Yes",
-          onClick: () => deleteproduct(itemid),
-        },
-        {
-          label: "No"
-          // onClick: () => alert("Click No")
-        }
-      ],
+  // const submitdeletecategory = (itemid) => {
+  //   confirmAlert({
+  //     title: "Confirmation",
+  //     message: `Are you sure to delete this ?`,
+  //     buttons: [
+  //       {
+  //         label: "Yes",
+  //         onClick: () => deleteproduct(itemid),
+  //       },
+  //       {
+  //         label: "No"
+  //         // onClick: () => alert("Click No")
+  //       }
+  //     ],
 
-    });
-  };
+  //   });
+  // };
   const setallnull = () => {
     setproductitm('')
     setproduct('')
@@ -293,6 +293,7 @@ export default function Adminorder() {
   }
   // console.log("dtaquannit",quantity)
   let mutipleselectvalue =(filter.length === 0 ? ordersearchdata : ordersearchdata.filter(t => parseInt(t.status[0].id) === parseInt(filter.id)))
+  
   const Multiselect = (itm) => {
     // console.log("itm",itm)
     if (itm === "all") {
@@ -368,7 +369,7 @@ export default function Adminorder() {
     
     {
       name: <div><input type="checkbox" id="" checked={mutivalue.length===mutipleselectvalue.length} value="all" onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br/>#</div>,
-      selector: (itm,index) => <div><input type="checkbox" id="" checked={mutivalue.includes(itm.id) ? mutivalue.includes(itm.id) : false} value={itm.id} onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br />{index+1}</div>,
+      selector: (itm,index) => <div><input type="checkbox" id="" checked={mutivalue.includes(itm.id) ? mutivalue.includes(itm.id) : false} value={itm.id} onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br />{(mutipleselectvalue.indexOf(itm) + 1)}</div>,
       width:"50px",
     },
     {

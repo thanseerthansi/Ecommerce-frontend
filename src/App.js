@@ -1,6 +1,6 @@
-import axios from "axios";
-import { useEffect } from "react";
-import { BrowserRouter as Router,Navigate,Route,Routes} from "react-router-dom";
+// import axios from "axios";
+// import { useEffect } from "react";
+import { BrowserRouter as Router,Route,Routes} from "react-router-dom";
 import './App.css';
 import Admincategory from "./components/Admincategory";
 import Admincity from "./components/Admincity";
@@ -13,9 +13,9 @@ import Adminmissorder from "./components/Adminmissorder";
 import Adminorder from "./components/Adminorder";
 import Adminproduct from "./components/Adminproduct";
 import Adminprofile from "./components/Adminprofile";
-import Home from './components/Home';
+// import Home from './components/Home';
 import Simplecontextprovider from "./components/Simplecontext";
-import { createBrowserHistory } from 'history';
+// import { createBrowserHistory } from 'history';
 import Adminstatus from "./components/Adminstatus";
 import Adminmetatags from "./components/Adminmetatags";
 

@@ -3,12 +3,12 @@ import Adminlogout from './Adminlogout';
 import Adminslider from './Adminslider';
 import { Icon } from '@iconify/react';
 // import Dropdown from 'react-bootstrap/Dropdown';
-import axios from 'axios';
+// import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
-import { BaseURL } from './Url';
+// import { BaseURL } from './Url';
 import { Simplecontext } from './Simplecontext';
 import Callaxios from './Callaxios';
 
