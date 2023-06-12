@@ -114,7 +114,7 @@ export default function Adminorder() {
 
       let datalist
       let msg
-      if (productitm.id) {
+      if (productitm?productitm:productitm.id) {
         datalist = {
           id: productitm.id,
           product: product,
