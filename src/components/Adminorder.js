@@ -11,7 +11,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { useDownloadExcel } from 'react-export-table-to-excel';
 import { Simplecontext } from './Simplecontext';
 import Callaxios from './Callaxios';
-// import { confirmAlert } from "react-confirm-alert";
+import { confirmAlert } from "react-confirm-alert";
 import "react-confirm-alert/src/react-confirm-alert.css";
 import {imageURL } from './Url';
 import DataTable from 'react-data-table-component';
@@ -24,6 +24,7 @@ export default function Adminorder() {
   const [citydata, setcitydata] = useState([]);
   const [searchvalue, setsearchvalue] = useState();
   const tableRef = useRef(null);
+  const tableRef360 = useRef(null);
   const [modalvalue, setmodalvalue] = useState(false)
   const [productdata, setproductdata] = useState([]);
   const [product, setproduct] = useState()
@@ -36,6 +37,9 @@ export default function Adminorder() {
   const [detailmodal, setdetailmodal] = useState(false);
   const [productitm, setproductitm] = useState()
   const [mutivalue, setmutivalues] = useState([])
+  console.log("productseletcc",productitm)
+  console.log("products",product)
+  console.log("productseletcc",productitm)
   // const arr = new Array(10).fill(0)
   const componentRef = useRef();
   const handlePrint = () => {
@@ -114,7 +118,8 @@ export default function Adminorder() {
 
       let datalist
       let msg
-      if (productitm.id) {
+      console.log("productitm",productitm)
+      if (productitm?productitm.id:productitm) {
         datalist = {
           id: productitm.id,
           product: product,
@@ -126,7 +131,7 @@ export default function Adminorder() {
         }
         msg = "Updated Successfully"
       } else {
-
+        console.log("orderlist")
         let datap = productdata.filter(t => t.id === parseInt(product))
         let price = quantity.split('-')[1]
         // let vat = datap[0]?.vat.toString() ?? ""
@@ -149,7 +154,7 @@ export default function Adminorder() {
       }
 
       let data = await Callaxios("post", "product/order/", datalist)
-      // console.log("datapost",data)
+      console.log("datapost",data)
       if (data.data.Status === 200) {
         notifyadd(msg)
         setmodalvalue(!modalvalue)
@@ -229,23 +234,23 @@ export default function Adminorder() {
     }
     else { setordersearchdata(orderdata) }
   }
-  // const submitdeletecategory = (itemid) => {
-  //   confirmAlert({
-  //     title: "Confirmation",
-  //     message: `Are you sure to delete this ?`,
-  //     buttons: [
-  //       {
-  //         label: "Yes",
-  //         onClick: () => deleteproduct(itemid),
-  //       },
-  //       {
-  //         label: "No"
-  //         // onClick: () => alert("Click No")
-  //       }
-  //     ],
+  const exporthadndler = () => {
+    confirmAlert({
+      title: "Export",
+      message: `Select the excel template!`,
+      buttons: [
+        {
+          label: "J&T Express",
+          onClick: () => onDownloadTable1(),
+        },
+        {
+          label: "360 Express",
+          onClick: () => onDownloadTable2(),
+        }
+      ],
 
-  //   });
-  // };
+    });
+  };
   const setallnull = () => {
     setproductitm('')
     setproduct('')
@@ -331,9 +336,14 @@ export default function Adminorder() {
   }
 
 
-  const { onDownload } = useDownloadExcel({
+  const { onDownload: onDownloadTable1 } = useDownloadExcel({
     currentTableRef: tableRef.current,
-    filename: 'Order table',
+    filename: 'J&T Express Upload',
+    sheet: 'Order'
+  })
+  const { onDownload: onDownloadTable2 } = useDownloadExcel({
+    currentTableRef: tableRef360.current,
+    filename: '360 Express ',
     sheet: 'Order'
   })
 
@@ -373,8 +383,8 @@ export default function Adminorder() {
       width:"50px",
     },
     {
-      name:"SN.NO",
-      selector : (itm)=><div style={{ cursor: "pointer" }} onClick={() => setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</div>,
+      name:"ORDER.NO",
+      selector : (itm)=><div style={{ cursor: "pointer" }} onClick={() => setdetailmodal(!detailmodal) & setproductitm(itm)} >JE{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</div>,
       width:"auto",
     },
     {
@@ -517,7 +527,7 @@ export default function Adminorder() {
                     currentTableRef={tableRef.current}
                 > */}
                     <div className='ps-4 '>
-                      <button onClick={() => mutivalue.length ? onDownload() : notifyerror("No Order Selected")} className='btn-sm btn-danger text-white float-end'  > Export to excel </button>
+                      <button onClick={() => mutivalue.length ? exporthadndler() : notifyerror("No Order Selected")} className='btn-sm btn-danger text-white float-end'  > Export to excel </button>
                     </div>
                     {/* </DownloadTableExcel> */}
                     {/* excel export button end */}
@@ -554,64 +564,7 @@ export default function Adminorder() {
                   // className="tablereact  tablereact "
                   customStyles={customStyles}
                 />
-                  {/* <table className="table table-bordered   overflow-auto">
-                    <thead className='text-center '>
-                      <tr>
-                        <th scope="col">
-                          <input type="checkbox" id="" checked={mutivalue.length===mutipleselectvalue.length} value="all" onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} />
-                          #</th>
-                        <th scope="col ">SN.No</th>
-                        <th scope="col">Product</th>
-                        <th scope="col">Customer</th>
-                        <th scope="col">Contact</th>
-                        <th scope="col">city</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Date</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className='text-center'>
-                      {(filter.length === 0 ? ordersearchdata : ordersearchdata.filter(t => parseInt(t.status[0].id) === parseInt(filter.id))).map((itm, k) => (
-                        <tr key={k} className="">
-                          <th scope="row"><input type="checkbox" id="" checked={mutivalue.includes(itm.id) ? mutivalue.includes(itm.id) : false} value={itm.id} onChange={(e) => e.target.checked ? Multiselect(e.target.value) : Deleteselect(e.target.value)} /><br />{k + 1}</th>
-                          <td style={{ cursor: "pointer" }} onClick={() => setdetailmodal(!detailmodal) & setproductitm(itm)} >SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
-                          <td className='flex text-start'>
-                            {itm.product ? itm.product[0].title : ""}<br />
-                            <img className='rounded  ' style={{ width: "50px" }} src={itm.product ? itm.product[0].images[0] ? imageURL + itm.product[0].images[0].image : null : null} alt="product" />
-                          </td>
-                          <td>{itm.customer_name}</td>
-                          <td>{itm.contact}</td>
-                          <td>{itm.city}</td>
-                          <td className='pt-3 '>
-                            <div>
-                              <span className='font-bold' style={{ backgroundColor: itm.status[0].color, padding: "5px", borderRadius: "4px", color: "white", fontWeight: "500" }}>{itm.status[0].status}</span>
-                            </div><br />
-                            <div>
-                              <select defaultValue={''} onChange={(e) => changestatus(itm.id, e.target.value)} >
-                                {filterstatus ? <>
-                                  <option value={''} hidden>change status</option>
-
-                                  {filterstatus.map((item, k) => (
-                                    <option key={k} value={item.status} style={{ backgroundColor: item.color, padding: "4px", borderRadius: "3px" }} >{item.status}</option>
-                                  ))}
-                                </> : null}
-                              </select>
-                            </div>
-
-                          </td>
-
-                          <td >{(itm.created_date).split('T')[0]}</td>
-
-                          <td className=''>
-                            <div className='d-flex'>
-                              <button onClick={() => productedithandler(itm) & setmodalvalue(!modalvalue) & Getproduct() & Getcity()} className='h-auto w-auto rounded d-flex text-white p-1 bg-warning mr-1 mb-1' ><Icon icon="clarity:note-edit-line" width="20" height="20" />Edit </button><br />
-                            </div>
-                            </td>
-
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table> */}
+                
                 </div>
               </div>
             </div>
@@ -619,44 +572,208 @@ export default function Adminorder() {
         </div>
       </div>
       {/* excelexport table startrs */}
+         
       <table ref={tableRef} hidden>
         <tbody>
-          <tr>
-            <th scope="col">Order_id </th>
-            <th scope="col">Name</th>
-            <th scope="col">Address</th>
-            <th scope="col">Contact_Number</th>
-            <th scope="col">City</th>
-            <th scope="col">Product_Code</th>
-            <th scope="col">Product_Name</th>
-            <th scope="col">Delivery_Charge</th>
-            <th scope="col">Product_Price</th>
-            <th scope="col">Quantity</th>
-            <th scope="col">Product_Sub_Price</th>
-            <th scope="col">Product_VAT</th>
-            <th scope="col">Product_Total_Price</th>
-            <th scope="col">Size</th>
-            <th scope="col">Color</th>
+          <tr style={{backgroundColor:"yellow"}}>
+            <th scope="col">Customer Order Number</th>
+            <th scope="col">*Receiver name</th>
+            <th scope="col">*Receiver phone number</th>
+            <th scope="col">Receiver Backup NO.</th>
+            <th scope="col">Receiver province</th>
+            <th scope="col">*Receiver city</th>
+            <th scope="col">Receiver street</th>
+            <th scope="col">Receiver District</th>
+            <th scope="col">*Receiver address</th>
+            <th scope="col">Receiver email</th>
+            <th scope="col">Receiver company name</th>
+            <th scope="col">*Product type</th>
+            <th scope="col">Payment type</th>
+            <th scope="col">PACKAGE</th>
+            <th scope="col">*Item type</th>
+            <th scope="col">*Item weight (kg)</th>
+            <th scope="col">*Item name</th>
+            <th scope="col">*Is it insured?</th>
+            <th scope="col">Declared value</th>
+            <th scope="col">Platform name</th>
+            <th scope="col">Customer account</th>
+            <th scope="col">COD amount</th>
+            <th scope="col">Currency type</th>
+            <th scope="col">*Customer unpacking inspection</th>
+            <th scope="col">Notes</th>
 
           </tr>
           {orderdata.length ? orderdata.filter(t => mutivalue.includes(t.id)).map((itm, k) => (
             <tr key={k}>
 
-              <td>SN{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+              <td>JE{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
               <td>{itm.customer_name}</td>
-              <td>{itm.delivery_address}</td>
               <td>{itm.contact}</td>
+              <td></td>
               <td>{itm.city}</td>
-              <td>{itm.product ? itm.product[0].code : ""} </td>
+              <td>{itm.city}</td>
+              <td></td>
+              <td></td>
+              <td>{itm.delivery_address}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>Cash</td>
+              <td></td>
+              <td></td>
+              <td>{itm.quantity}  </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
+              <td>AED</td>
+              <td></td>
               <td>{itm.product ? itm.product[0].title : ""} </td>
+              
+              {/* <td>{itm.product ? itm.product[0].code : ""} </td>
               <td>{itm.delivery_charge}</td>
-              <td>{itm.price}</td>
+              
               <td>{itm.quantity}</td>
               <td>{itm.price}</td>
               <td>{itm.product ? itm.product[0].vat ? (itm.price * 0.05).toFixed(2) : 0 : 0}</td>
               <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
               <td>{itm.size === 0 ? "" : itm.size}</td>
-              <td>{itm.color}</td>
+              <td>{itm.color}</td> */}
+
+            </tr>
+          )) : null}
+
+
+        </tbody>
+      </table>
+      <table ref={tableRef360} hidden>
+        <tbody>
+          <tr>
+            <th ></th>
+            <th ></th>
+            <th colSpan={12} style={{backgroundColor:"#ffff80"}}>Shipper Information</th>
+            <th colSpan={11} style={{backgroundColor:"#40bf80"}}>Consignee Information</th>
+            <th colSpan={6} style={{backgroundColor:"#80bfff" }}>Package Details</th>
+            <th colSpan={6} style={{backgroundColor:"#ffcccc" }}>Item Details</th>
+            <th colSpan={1} >Fulfillment</th>
+            <th colSpan={4} >Freight</th>
+            <th colSpan={3} >Delivery Charge</th>
+            <th colSpan={2} >COD</th>
+          </tr>
+          <tr >
+            <th scope="col">Client ID</th>
+            <th scope="col">Booking Type</th>
+            <th scope="col">Shipper Reference</th>
+            <th scope="col">Name</th>
+            <th scope="col">Company Name</th>
+            <th scope="col">Contact</th>
+            <th scope="col">Alternate Contact</th>
+            <th scope="col">Email</th>
+            <th scope="col">Address</th>
+            <th scope="col">Area</th>
+            <th scope="col">Postal Code</th>
+            <th scope="col">Country</th>
+            <th scope="col">City</th>
+            <th scope="col">State</th>
+            <th scope="col">Name</th>
+            <th scope="col">Company Name</th>
+            <th scope="col">Contact</th>
+            <th scope="col">Alternate Contact</th>
+            <th scope="col">Email</th>
+            <th scope="col">Address</th>
+            <th scope="col">Area</th>
+            <th scope="col">Postal Code</th>
+            <th scope="col">Country</th>
+            <th scope="col">City</th>
+            <th scope="col">State</th>
+            <th scope="col">Package Type</th>
+            <th scope="col"> H</th>
+            <th scope="col"> W</th>
+            <th scope="col"> L</th>
+            <th scope="col"> Weight</th>
+            <th scope="col"> Pieces</th>
+            <th scope="col"> Item Description</th>
+            <th scope="col"> SKU</th>
+            <th scope="col"> HS Code</th>
+            <th scope="col"> Country of Origin</th>
+            <th scope="col"> Declared Value</th>
+            <th scope="col"> Item Quantity</th>
+            <th scope="col"> Fulfillment Location</th>
+            <th scope="col"> Declared Value Currency</th>
+            <th scope="col"> Currency</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Payer</th>
+            <th scope="col">Currency</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Payer</th>
+            <th scope="col">Currency</th>
+            <th scope="col">Amount</th>
+            {/* <th scope="col">Customer Order Number</th>
+            <th scope="col">*Receiver name</th>
+            <th scope="col">*Receiver phone number</th>
+            <th scope="col">Receiver Backup NO.</th>
+            <th scope="col">Receiver province</th>
+            <th scope="col">*Receiver city</th>
+            <th scope="col">Receiver street</th>
+            <th scope="col">Receiver District</th>
+            <th scope="col">*Receiver address</th>
+            <th scope="col">Receiver email</th>
+            <th scope="col">Receiver company name</th>
+            <th scope="col">*Product type</th>
+            <th scope="col">Payment type</th>
+            <th scope="col">PACKAGE</th>
+            <th scope="col">*Item type</th>
+            <th scope="col">*Item weight (kg)</th>
+            <th scope="col">*Item name</th>
+            <th scope="col">*Is it insured?</th>
+            <th scope="col">Declared value</th>
+            <th scope="col">Platform name</th>
+            <th scope="col">Customer account</th>
+            <th scope="col">COD amount</th>
+            <th scope="col">Currency type</th>
+            <th scope="col">*Customer unpacking inspection</th>
+            <th scope="col">Notes</th> */}
+          </tr>
+          {orderdata.length ? orderdata.filter(t => mutivalue.includes(t.id)).map((itm, k) => (
+            <tr key={k}>
+              <td></td>
+              <td>JE{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+              <td>{itm.customer_name}</td>
+              <td>{itm.contact}</td>
+              <td></td>
+              <td>{itm.city}</td>
+              <td>{itm.city}</td>
+              <td></td>
+              <td></td>
+              <td>{itm.delivery_address}</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>Cash</td>
+              <td></td>
+              <td></td>
+              <td>{itm.quantity}  </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
+              <td>AED</td>
+              <td></td>
+              <td>{itm.product ? itm.product[0].title : ""} </td>
+              
+              {/* <td>{itm.product ? itm.product[0].code : ""} </td>
+              <td>{itm.delivery_charge}</td>
+              
+              <td>{itm.quantity}</td>
+              <td>{itm.price}</td>
+              <td>{itm.product ? itm.product[0].vat ? (itm.price * 0.05).toFixed(2) : 0 : 0}</td>
+              <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
+              <td>{itm.size === 0 ? "" : itm.size}</td>
+              <td>{itm.color}</td> */}
 
             </tr>
           )) : null}
@@ -791,7 +908,7 @@ export default function Adminorder() {
               </div>
               <div ref={componentRef} className="print-section">
                 <div>
-                  <b>OrderNo / Date : </b><span> SN{productitm ? productitm.created_date.split('T')[1].split('.')[1] + productitm.id : null} / {productitm ? productitm.created_date.split('T')[0] : null} </span><b></b><br />
+                  <b>OrderNo / Date : </b><span> JE{productitm ? productitm.created_date.split('T')[1].split('.')[1] + productitm.id : null} / {productitm ? productitm.created_date.split('T')[0] : null} </span><b></b><br />
                   <b>Customer : </b><span> {productitm ? productitm.customer_name : null}</span><br />
                   <b>Address : </b><span> {productitm ? productitm.delivery_address : null}</span><br />
                 </div>
