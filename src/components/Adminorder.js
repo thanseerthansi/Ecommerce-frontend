@@ -37,9 +37,9 @@ export default function Adminorder() {
   const [detailmodal, setdetailmodal] = useState(false);
   const [productitm, setproductitm] = useState()
   const [mutivalue, setmutivalues] = useState([])
-  console.log("productseletcc",productitm)
-  console.log("products",product)
-  console.log("productseletcc",productitm)
+  // console.log("productseletcc",productitm)
+  // console.log("products",product)
+  // console.log("productseletcc",productitm)
   // const arr = new Array(10).fill(0)
   const componentRef = useRef();
   const handlePrint = () => {
@@ -237,7 +237,7 @@ export default function Adminorder() {
   const exporthadndler = () => {
     confirmAlert({
       title: "Export",
-      message: `Select the excel template!`,
+      message: `Select the excel template !`,
       buttons: [
         {
           label: "J&T Express",
@@ -739,7 +739,54 @@ export default function Adminorder() {
           {orderdata.length ? orderdata.filter(t => mutivalue.includes(t.id)).map((itm, k) => (
             <tr key={k}>
               <td></td>
-              <td>JE{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
+              <td>E-commerce</td>
+              <td></td>
+              <td>Jetronics LLC</td>
+              <td>Jetronics LLC</td>
+              <td>97 1589989090</td>
+              <td></td>
+              <td></td>
+              <td>Al Qouz Industrial 1, Dubai </td>
+              <td>Al Qouz </td>
+              <td></td>
+              <td>AE</td>
+              <td>Dubai</td>
+              <td>Dubai</td>
+              <td>{itm.customer_name}</td>
+              <td>Jetronics LLC</td>
+              <td>{itm.contact}</td>
+              <td></td>
+              <td></td>
+              <td>{itm.delivery_address}</td>
+              <td>{itm.city}</td>
+              <td></td>
+              <td>AE</td>
+              <td>{itm.city}</td>
+              <td>{itm.city}</td>
+              <td>Non-Document</td>
+              <td>{itm.quantity}  </td>
+              <td>{itm.quantity}  </td>
+              <td>{itm.quantity}  </td>
+              <td>{itm.quantity}  </td>
+              <td>{itm.quantity}  </td>
+              <td>{itm.product ? itm.product[0].title : ""} </td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{itm.quantity}  </td>
+              <td>Client</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>AED</td>
+              <td>{itm.delivery_charge}</td>
+              <td></td>
+              <td>AED</td>
+              <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
+
+              {/* <td>JE{itm.created_date.split('T')[1].split('.')[1]}{itm.id}</td>
               <td>{itm.customer_name}</td>
               <td>{itm.contact}</td>
               <td></td>
@@ -763,7 +810,7 @@ export default function Adminorder() {
               <td>{parseFloat(parseFloat(itm.price * itm.quantity) + parseFloat(itm.delivery_charge ? itm.delivery_charge : 0) + parseFloat(itm.product[0].vat ? itm.price * parseFloat(0.05) : 0)).toFixed()}</td>
               <td>AED</td>
               <td></td>
-              <td>{itm.product ? itm.product[0].title : ""} </td>
+              <td>{itm.product ? itm.product[0].title : ""} </td> */}
               
               {/* <td>{itm.product ? itm.product[0].code : ""} </td>
               <td>{itm.delivery_charge}</td>
