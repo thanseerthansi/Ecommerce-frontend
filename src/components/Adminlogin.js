@@ -65,7 +65,7 @@ export default function Adminlogin () {
             <div className="col-12 col-md-8 col-lg-6 col-xl-5">
               <div className="card bg-dark text-white" style={{borderRadius: '1rem'}}>
                 <div className="card-body p-md-4 m-md-2 text-center">
-                <img src="/assets/img/logo.jpg" loading="lazy" alt="bisum" />
+                <img src="/assets/img/logo.png" width="80%" loading="lazy" alt="bisum" />
                 <h5 className="fw-bold  mt-2 d-flex justify-content-center align-items-center " style={{color:"rgb(251 191 36)"}}>Admin Login</h5>
                   <div className="mb-md-5 mt-md-3 pb-2">
                    
