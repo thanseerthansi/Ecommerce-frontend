@@ -2,5 +2,5 @@
 // export const imageURL = 'http://192.168.1.54:8000'
 // export const BaseURL = 'https://jetronics.foxiomlabs.com/'
 // export const imageURL = 'https://jetronics.foxiomlabs.com'
-export const BaseURL = 'http://3.29.100.10/'
-export const imageURL = 'http://3.29.100.10'
+export const BaseURL = 'https://server.jetuae.com/'
+export const imageURL = 'https://server.jetuae.com'
